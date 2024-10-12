@@ -1,11 +1,12 @@
 package pieces;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
+
+import javax.swing.*;
 
 import pieces.PieceColor;
 
 public abstract class Piece extends Component {
     protected PieceColor color; 
-    protected BufferedImage pieceImage;
+    protected Image pieceImage;
 }
