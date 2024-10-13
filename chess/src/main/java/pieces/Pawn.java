@@ -16,14 +16,19 @@ public class Pawn extends Piece {
         this.color = c;
     }
 
+    @Override
     public void paint(Graphics g) {
         Toolkit t = Toolkit.getDefaultToolkit();
         
+        String filename;
+
         if (this.color.equals(PieceColor.BLACK)) {
-            this.pieceImage = t.getImage("chess/src/main/resources/black_pawn.png");
+            filename = "black_pawn.png";
         } else {
-            // this.pieceImage = ImageIO.read(new File("resources/white_pawn.svg"));
+            filename = "white_pawn.png";
         }
+
+        this.pieceImage = t.getImage("chess/src/main/resources/" + filename);
 
         g.drawImage(this.pieceImage, 0, 0, null);
     }
