@@ -5,12 +5,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-// Források: 
-/*
- * https://stackoverflow.com/questions/15694107/how-to-layout-multiple-panels-on-a-jframe-java
- * https://www.javatpoint.com/java-jbutton
- */
-
 public class Program {
     private static JFrame mainFrame;
 
