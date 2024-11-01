@@ -25,7 +25,6 @@ public class Pawn extends Piece {
      */
     @Override
     public List<Position> getEveryMove() {
-        System.out.println("HELLO");
         List<Position> positions = new ArrayList<>();
 
         positions.add(position.forward(color));

@@ -20,7 +20,7 @@ public class Position {
     }
 
     public Position(String c, int r) {
-        this(letters.indexOf(c), r);
+        this(letters.indexOf(c) + 1, r);
     }
 
     public void set(int r, int c) {
@@ -29,26 +29,79 @@ public class Position {
     }
 
     public String columnToString() {
-        return letters.get(column);
+        return letters.get(column - 1);
+    }
+
+    public boolean isOutOfBounds() {
+        return row > 8 || row < 1 || column > 8 || column < 1;
     }
 
     public Position forward(PieceColor color) {
+        Position position;
+
         if (color == PieceColor.WHITE) {
-            return new Position(column, row + 1);
+            position = new Position(column, row + 1);
+        } else {
+            position = new Position(column, row - 1);
         }
 
-        return new Position(column, row - 1);
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
     }
 
     public Position backwards(PieceColor color) {
+        Position position;
+
         if (color == PieceColor.WHITE) {
-            return new Position(column, row - 1);
+            position = new Position(column, row - 1);
+        } else {
+            position = new Position(column, row + 1);
         }
 
-        return new Position(column, row + 1);
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
+    }
+
+    public Position right(PieceColor color) {
+        Position position;
+
+        if (color == PieceColor.WHITE) {
+            position = new Position(column + 1, row);
+        } else {
+            position = new Position(column - 1, row);
+        }
+
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
+    }
+
+    public Position left(PieceColor color) {
+        Position position;
+
+        if (color == PieceColor.WHITE) {
+            position = new Position(column - 1, row);
+        } else {
+            position = new Position(column + 1, row);
+        }
+
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
     }
 
     public Position rightDiagonal(PieceColor color, Direction direction) {
+        Position position;
         int shifting = -1;
 
         if (direction == Direction.FORWARD) {
@@ -56,13 +109,20 @@ public class Position {
         }
 
         if (color == PieceColor.WHITE) {
-            return new Position(column + shifting, row + shifting);
+            position = new Position(column + shifting, row + shifting);
+        } else {
+            position = new Position(column - shifting, row - shifting);
         }
 
-        return new Position(column - shifting, row - shifting);
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
     }
 
     public Position leftDiagonal(PieceColor color, Direction direction) {
+        Position position;
         int shifting = -1;
 
         if (direction == Direction.FORWARD) {
@@ -70,10 +130,16 @@ public class Position {
         }
 
         if (color == PieceColor.WHITE) {
-            return new Position(column - shifting, row + shifting);
+            position = new Position(column - shifting, row + shifting);
+        } else {
+            position = new Position(column + shifting, row - shifting);
         }
 
-        return new Position(column + shifting, row - shifting);
+        if (position.isOutOfBounds()) {
+            return null;
+        }
+
+        return position;
     }
 
     @Override

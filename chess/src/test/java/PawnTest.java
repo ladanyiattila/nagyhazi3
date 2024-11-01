@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import pieces.Pawn;
@@ -20,20 +21,38 @@ class PawnTest {
     @Test
     void movementTest() {
         List<Position> whiteMovementList = whitePawn.getEveryMove();
+        List<Position> expectedList = new ArrayList<>(List.of(
+            new Position("e", 3),
+            new Position("e", 4),
+            new Position("f", 3),
+            new Position("d", 3)
+        ));
 
-        System.out.println(whiteMovementList.size());
-
-        assertTrue(hasPosition(whiteMovementList, new Position("e", 3))); // 1 előre
-        assertTrue(hasPosition(whiteMovementList, new Position("e", 4))); // 2 előre
-        assertTrue(hasPosition(whiteMovementList, new Position("f", 3))); // jobbra átlósan 1
-        assertTrue(hasPosition(whiteMovementList, new Position("d", 3))); // balra átlósan 1
+        assertTrue(equalLists(expectedList, whiteMovementList));
 
         List<Position> blackMovementList = blackPawn.getEveryMove();
+        expectedList = new ArrayList<>(List.of(
+            new Position("e", 6),
+            new Position("e", 5),
+            new Position("d", 6),
+            new Position("f", 6)
+        ));
 
-        assertTrue(hasPosition(blackMovementList, new Position("e", 6))); // 1 előre
-        assertTrue(hasPosition(blackMovementList, new Position("e", 5))); // 2 előre
-        assertTrue(hasPosition(blackMovementList, new Position("d", 6))); // jobbra átlósan 1
-        assertTrue(hasPosition(blackMovementList, new Position("f", 6))); // balra átlósan 1
+        assertTrue(equalLists(expectedList, blackMovementList));
+    }
+
+    public boolean equalLists(List<Position> expected, List<Position> got) {
+        if (expected.size() != got.size()) {
+            return false;
+        }
+
+        for (Position position : got) {
+            if (!hasPosition(expected, position)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public boolean hasPosition(List<Position> list, Position position) {

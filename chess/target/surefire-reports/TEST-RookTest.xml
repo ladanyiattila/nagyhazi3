@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="PawnTest" time="0.141" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="RookTest" time="0.018" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="sun.desktop" value="gnome"/>
     <property name="awt.toolkit" value="sun.awt.X11.XToolkit"/>
@@ -59,5 +59,35 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="55.0"/>
   </properties>
-  <testcase name="movementTest" classname="PawnTest" time="0.111"/>
+  <testcase name="movementTest" classname="RookTest" time="0.014">
+    <system-out><![CDATA[e 5
+e 6
+e 7
+e 8
+e 3
+e 2
+e 1
+f 4
+g 4
+h 4
+d 4
+c 4
+b 4
+a 4
+a 7
+a 6
+a 5
+a 4
+a 3
+a 2
+a 1
+b 8
+c 8
+d 8
+e 8
+f 8
+g 8
+h 8
+]]></system-out>
+  </testcase>
 </testsuite>
