@@ -1,0 +1,5 @@
+-------------------------------------------------------------------------------
+Test set: PawnTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.09 s - in PawnTest
+PawnTest.movementTest  Time elapsed: 0.07 s
