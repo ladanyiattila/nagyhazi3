@@ -106,7 +106,27 @@ public class Program {
 
         Board board = new Board();
 
+        JTextArea movesText = new JTextArea();
+        movesText.setSize(new Dimension(300, 400));
+        movesText.enableInputMethods(false);
+        movesText.setEditable(false);
+        movesText.setLineWrap(true);
+        movesText.setWrapStyleWord(true);
+
+        String s = "";
+
+        for (int i = 0; i < 200; i++) {
+            movesText.append("verylongtext" + Integer.toString(i) + " ");
+        }
+
+        // a doboz tartalma görgethető legyen
+        JScrollPane movesScroll = new JScrollPane(movesText);
+        movesScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        movesScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+
         mainFrame.add(board.getBoardPanel(), BorderLayout.WEST);
+        mainFrame.add(movesScroll, BorderLayout.EAST);
         mainFrame.setVisible(true);
     }
 

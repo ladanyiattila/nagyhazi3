@@ -9,6 +9,12 @@ public class Bishop extends Piece {
     public Bishop(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
+
+        if (c == PieceColor.WHITE) {
+            this.imageName = "white_bishop.png";
+        } else {
+            this.imageName = "black_bishop.png";
+        }
     }
 
     /*

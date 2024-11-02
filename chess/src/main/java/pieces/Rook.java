@@ -9,6 +9,12 @@ public class Rook extends Piece {
     public Rook(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
+
+        if (c == PieceColor.WHITE) {
+            this.imageName = "white_rook.png";
+        } else {
+            this.imageName = "black_rook.png";
+        }
     }
 
     /*

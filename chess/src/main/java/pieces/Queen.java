@@ -9,6 +9,12 @@ public class Queen extends Piece {
     public Queen(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
+
+        if (c == PieceColor.WHITE) {
+            this.imageName = "white_queen.png";
+        } else {
+            this.imageName = "black_queen.png";
+        }
     }
 
     /*

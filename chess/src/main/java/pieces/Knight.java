@@ -9,6 +9,12 @@ public class Knight extends Piece {
     public Knight(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
+
+        if (c == PieceColor.WHITE) {
+            this.imageName = "white_knight.png";
+        } else {
+            this.imageName = "black_knight.png";
+        }
     }
 
     /*

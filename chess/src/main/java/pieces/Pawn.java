@@ -14,6 +14,12 @@ public class Pawn extends Piece {
     public Pawn(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
+
+        if (c == PieceColor.WHITE) {
+            this.imageName = "white_pawn.png";
+        } else {
+            this.imageName = "black_pawn.png";
+        }
     }
 
     /*

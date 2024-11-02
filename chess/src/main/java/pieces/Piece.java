@@ -9,6 +9,15 @@ import pieces.*;
 public abstract class Piece extends Component {
     protected PieceColor color; 
     protected Position position;
+    protected String imageName;
 
     protected List<Position> getEveryMove() { return null; }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public String getImageName() {
+        return imageName;
+    }
 }
