@@ -2,10 +2,14 @@ package chess;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import javax.swing.*;
 
+import chess.*;
+import main.java.chess.*;
+
 public class Program {
+    private Program() {}
+
     private static JFrame mainFrame;
 
     public static void startProgram() {
@@ -59,6 +63,7 @@ public class Program {
         startGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 titlePanel.setVisible(false);
+                authorPanel.setVisible(false);
                 bottomPanel.setVisible(false);
                 startGame();
             }
@@ -97,7 +102,12 @@ public class Program {
     }
 
     private static void startGame() {
-        // TODO
+        mainFrame.setSize(1000, 750);
+
+        Board board = new Board();
+
+        mainFrame.add(board.getBoardPanel(), BorderLayout.WEST);
+        mainFrame.setVisible(true);
     }
 
     private static void readTextFile() {
