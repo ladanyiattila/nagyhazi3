@@ -1,0 +1,7 @@
+pieces/Bishop.class
+pieces/Direction.class
+pieces/Position.class
+pieces/King.class
+pieces/Rook.class
+pieces/Knight.class
+pieces/Queen.class

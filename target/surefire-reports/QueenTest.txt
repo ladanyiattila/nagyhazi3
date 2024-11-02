@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
-Test set: RookTest
+Test set: QueenTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s - in RookTest
-RookTest.movementTest  Time elapsed: 0.003 s
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.01 s - in QueenTest
+QueenTest.movementTest  Time elapsed: 0.004 s

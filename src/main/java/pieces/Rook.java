@@ -13,7 +13,7 @@ public class Rook extends Piece {
 
     /*
      * Lehetséges lépések:
-     * minden irányba annyit, amíg akadályba nem ütközik
+     * függőlegesen vagy vízszintesen annyit, amíg akadályba nem ütközik
      */
     @Override
     public List<Position> getEveryMove() {
@@ -45,10 +45,6 @@ public class Rook extends Piece {
         while (move != null) {
             positions.add(move);
             move = move.left(color);
-        }
-
-        for (Position p : positions) {
-            System.out.println(p);
         }
 
         return positions;

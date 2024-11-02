@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args) {
         Program.startProgram();
 
-        Rook r = new Rook(PieceColor.WHITE, new Position("e", 4));
+        Queen r = new Queen(PieceColor.WHITE, new Position("d", 1));
         r.getEveryMove();
     }
 }
