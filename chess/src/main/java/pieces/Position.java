@@ -151,4 +151,12 @@ public class Position {
     public String toString() {
         return columnToString() + " " + row;
     }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public int getRow() {
+        return row;
+    }
 }

@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.io.File;
 
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+
 import java.util.*;
 
 import pieces.*;
@@ -16,6 +18,7 @@ public class Board {
     private JPanel boardPanel;
     private static String[] columns = { "", "A", "B", "C", "D", "E", "F", "G", "H" };
     private static List<Piece> actualPosition;
+    private static DefaultTableModel tableModel;
 
     public Board() {
         boardPanel = new JPanel();
@@ -23,17 +26,32 @@ public class Board {
         boardPanel.setBackground(Color.red);
 
         String[][] rows = new String[9][9];
-        JTable boardTable = new JTable(rows, columns);
+        tableModel = new DefaultTableModel(rows, columns);
+        JTable boardTable = new JTable(tableModel);
 
         actualPosition = getStartingPosition();
 
         boardTable.setRowHeight(75);
 
+        boardTable.setCellSelectionEnabled(true);
+
+        boardTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        boardTable.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         for (int i = 0; i < 9; i++) {
             boardTable.getColumnModel().getColumn(i).setCellRenderer(new CellRenderer());
         }
 
+        
+
         boardPanel.add(boardTable);
+    }
+
+    private static void paintCellBlue(int row, int column) {
+        JLabel label = new JLabel();
+        label.setOpaque(true);
+        label.setBackground(Color.blue);
+        tableModel.setValueAt(label, row, column);
     }
 
     private static List<Piece> getStartingPosition() {
@@ -71,6 +89,19 @@ public class Board {
     }
 
     static class CellRenderer extends DefaultTableCellRenderer {
+        private List<Position> possibleMoves;
+
+        private static Piece getPieceInActualPosition(Position position) {
+            for (Piece piece : actualPosition) {
+                System.out.println(piece.getPosition());
+                if (piece.getPosition().equals(position)) {
+                    return piece;
+                }
+            }
+
+            return null;
+        }
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (column == 0 && row == 8) {
@@ -97,8 +128,9 @@ public class Board {
 
 
             JLabel label = new JLabel();
+            Position cellPosition = new Position(column, 8 - row);
             for (Piece piece : actualPosition) {
-                if (piece.getPosition().equals(new Position(column, row + 1))) {
+                if (piece.getPosition().equals(cellPosition)) {
                     label.setIcon(new ImageIcon("piece_images/" + piece.getImageName()));
                 }
             }
@@ -108,14 +140,29 @@ public class Board {
             } else {
                 label.setBackground(Color.white);
             }
+
+            if (possibleMoves != null) {
+                for (Position position : possibleMoves) {
+                    if (position != null && cellPosition.equals(position)) {
+                        paintCellBlue(position.getRow(), position.getColumn());
+                    }
+                }
+            }
             
 
             label.setOpaque(true);
 
-            /*if (isSelected) {
-                label.setBackground(table.getSelectionBackground());
-                label.setForeground(table.getSelectionForeground());
-            }*/
+            if (isSelected) {
+                Position clickedPosition = new Position(column, 8 - row);
+                System.out.println("selected: " + column + " " + (8 - row) + " pos:" + clickedPosition.toString());
+
+                Piece pieceThere = getPieceInActualPosition(clickedPosition);
+
+                System.out.println("possible moves:");
+                if (pieceThere != null) {
+                    possibleMoves = pieceThere.getEveryMove();
+                }
+            }
 
             return label;
         }

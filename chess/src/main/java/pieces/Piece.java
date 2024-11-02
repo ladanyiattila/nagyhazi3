@@ -11,7 +11,7 @@ public abstract class Piece extends Component {
     protected Position position;
     protected String imageName;
 
-    protected List<Position> getEveryMove() { return null; }
+    public List<Position> getEveryMove() { return null; }
 
     public Position getPosition() {
         return position;
