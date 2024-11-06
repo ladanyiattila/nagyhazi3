@@ -17,7 +17,15 @@ public abstract class Piece extends Component {
         return position;
     }
 
+    public void setPosition(Position p) {
+        position = p;
+    }
+
     public String getImageName() {
         return imageName;
+    }
+
+    public PieceColor getColor() {
+        return color;
     }
 }

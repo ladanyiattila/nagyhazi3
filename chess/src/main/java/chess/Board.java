@@ -4,11 +4,15 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Label;
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
 import java.io.File;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.MouseEvent;
 
 import java.util.*;
 
@@ -19,6 +23,7 @@ public class Board {
     private static String[] columns = { "", "A", "B", "C", "D", "E", "F", "G", "H" };
     private static List<Piece> actualPosition;
     private static DefaultTableModel tableModel;
+    private static JTable boardTable;
 
     public Board() {
         boardPanel = new JPanel();
@@ -27,7 +32,12 @@ public class Board {
 
         String[][] rows = new String[9][9];
         tableModel = new DefaultTableModel(rows, columns);
-        JTable boardTable = new JTable(tableModel);
+        boardTable = new JTable(tableModel) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         actualPosition = getStartingPosition();
 
@@ -42,17 +52,11 @@ public class Board {
             boardTable.getColumnModel().getColumn(i).setCellRenderer(new CellRenderer());
         }
 
-        
+        boardTable.addMouseListener(new ClickedOnTable());        
 
         boardPanel.add(boardTable);
     }
 
-    private static void paintCellBlue(int row, int column) {
-        JLabel label = new JLabel();
-        label.setOpaque(true);
-        label.setBackground(Color.blue);
-        tableModel.setValueAt(label, row, column);
-    }
 
     private static List<Piece> getStartingPosition() {
         List<Piece> pieces = new ArrayList<>();
@@ -88,20 +92,70 @@ public class Board {
         return pieces;
     }
 
-    static class CellRenderer extends DefaultTableCellRenderer {
-        private List<Position> possibleMoves;
 
-        private static Piece getPieceInActualPosition(Position position) {
-            for (Piece piece : actualPosition) {
-                System.out.println(piece.getPosition());
-                if (piece.getPosition().equals(position)) {
-                    return piece;
-                }
+    private static List<Position> possibleMoves;
+    private static Piece clickedPiece;
+
+    private static Piece getPieceInActualPosition(Position position) {
+        for (Piece piece : actualPosition) {
+            if (piece.getPosition().equals(position)) {
+                return piece;
             }
-
-            return null;
         }
 
+        return null;
+    }
+
+    private static boolean isInPossibleMove(Position pos) {
+        for (Position position : possibleMoves) {
+            if (position.equals(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    class ClickedOnTable extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            int row = boardTable.rowAtPoint(e.getPoint());
+            int column = boardTable.columnAtPoint(e.getPoint());
+
+            if (row >= 0 && column >= 0) {                
+                Position clickedPosition = new Position(column, 8 - row);
+                Piece pieceThere = getPieceInActualPosition(clickedPosition);
+                
+                if (pieceThere != null) {
+                    List<Position> allMoves = pieceThere.getEveryMove();
+                    clickedPiece = pieceThere;
+
+                    ListIterator<Position> iter = allMoves.listIterator();
+
+                    while (iter.hasNext()) {
+                        Position current = iter.next();
+                        
+                        if (!Rules.isMovePossible(actualPosition, pieceThere, current)) {
+                            iter.remove();
+                        }
+                    }
+
+
+                    possibleMoves = allMoves;
+                } else if (isInPossibleMove(clickedPosition)) {
+                    clickedPiece.setPosition(clickedPosition);
+                    possibleMoves = null;
+                } else {
+                    possibleMoves = null;
+                    clickedPiece = null;
+                }
+
+                boardTable.repaint();
+            }
+        }
+    }
+
+
+    static class CellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (column == 0 && row == 8) {
@@ -142,27 +196,22 @@ public class Board {
             }
 
             if (possibleMoves != null) {
-                for (Position position : possibleMoves) {
-                    if (position != null && cellPosition.equals(position)) {
-                        paintCellBlue(position.getRow(), position.getColumn());
+                for (Position p : possibleMoves) {
+                    Position there = new Position(column, 8 - row);
+
+                    if (p.equals(there)) {
+                        label.setBackground(Color.blue);
+
+                        for (Piece piece : actualPosition) {
+                            if (piece.getPosition().equals(there)) {
+                                label.setBackground(Color.red);
+                            }
+                        }
                     }
                 }
             }
-            
 
             label.setOpaque(true);
-
-            if (isSelected) {
-                Position clickedPosition = new Position(column, 8 - row);
-                System.out.println("selected: " + column + " " + (8 - row) + " pos:" + clickedPosition.toString());
-
-                Piece pieceThere = getPieceInActualPosition(clickedPosition);
-
-                System.out.println("possible moves:");
-                if (pieceThere != null) {
-                    possibleMoves = pieceThere.getEveryMove();
-                }
-            }
 
             return label;
         }

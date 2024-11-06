@@ -33,7 +33,11 @@ public class Pawn extends Piece {
     public List<Position> getEveryMove() {
         List<Position> positions = new ArrayList<>();
 
-        positions.add(position.forward(color));
+        Position move = position.forward(color);
+
+        if (move != null) {
+            positions.add(move);
+        }
 
         // kezdő sorból 2 lépés is lehetséges
         if ((color == PieceColor.WHITE && position.row == 2) 
@@ -41,8 +45,17 @@ public class Pawn extends Piece {
             positions.add(position.forward(color).forward(color));
         }
 
-        positions.add(position.rightDiagonal(color, Direction.FORWARD));
-        positions.add(position.leftDiagonal(color, Direction.FORWARD));
+        move = position.rightDiagonal(color, Direction.FORWARD);
+
+        if (move != null) {
+            positions.add(move);
+        }
+
+        move = position.leftDiagonal(color, Direction.FORWARD);
+
+        if (move != null) {
+            positions.add(move);
+        }
 
         return positions;
     }
