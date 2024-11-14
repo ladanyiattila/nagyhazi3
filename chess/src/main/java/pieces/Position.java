@@ -145,7 +145,7 @@ public class Position {
     @Override
     public boolean equals(Object rhs) {
         Position other = (Position) rhs;
-        return other.column == column && other.row == row;
+        return (other.getColumn() == this.column && other.getRow() == this.row);
     }
 
     public String toString() {

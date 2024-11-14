@@ -107,6 +107,10 @@ public class Board {
     }
 
     private static boolean isInPossibleMove(Position pos) {
+        if (possibleMoves == null) {
+            return false;
+        }
+
         for (Position position : possibleMoves) {
             if (position.equals(pos)) {
                 return true;
@@ -139,9 +143,15 @@ public class Board {
                         }
                     }
 
-
                     possibleMoves = allMoves;
                 } else if (isInPossibleMove(clickedPosition)) {
+                    for (Piece piece : actualPosition) {
+                        if (clickedPiece.equals(piece)) {
+                            piece.setPosition(new Position(clickedPosition.getColumn(), clickedPosition.getRow()));
+                        }
+                    }
+
+
                     clickedPiece.setPosition(clickedPosition);
                     possibleMoves = null;
                 } else {

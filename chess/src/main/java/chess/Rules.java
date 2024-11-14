@@ -14,23 +14,23 @@ public class Rules {
     }
 
     private static boolean possibleInThatWay(List<Piece> actualPosition, Piece movePiece, Position move, Function<Position, Position> function) {
-        Position movePosition = movePiece.getPosition();
+        Position movePosition = new Position(movePiece.getPosition().getColumn(), movePiece.getPosition().getRow());
         movePosition = function.apply(movePosition);
 
         while (movePosition != null) {
-            for (Piece piece : actualPosition) {
-                if (piece.getPosition().equals(movePosition) && !movePosition.equals(move)) {
-                    return false;
-                }
-            }
-
             if (movePosition.equals(move)) {
                 break;
             }
 
-            movePosition = movePosition.right(movePiece.getColor());
-        }
+            for (Piece piece : actualPosition) {
+                if (piece.getPosition().equals(movePosition)) {
+                    return false;
+                }
+            }
 
+            movePosition = function.apply(movePosition);        
+        }
+        
         return true;
     }
 

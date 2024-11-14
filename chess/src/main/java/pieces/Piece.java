@@ -8,7 +8,7 @@ import pieces.*;
 
 public abstract class Piece extends Component {
     protected PieceColor color; 
-    protected Position position;
+    transient protected Position position;
     protected String imageName;
 
     public List<Position> getEveryMove() { return null; }
@@ -27,5 +27,9 @@ public abstract class Piece extends Component {
 
     public PieceColor getColor() {
         return color;
+    }
+
+    public String toString() {
+        return color + " " + position;
     }
 }
