@@ -7,12 +7,6 @@ import java.math.*;
 import pieces.*;
 
 public class Rules {
-    public static PieceColor nextMove;
-
-    static {
-        nextMove = PieceColor.WHITE;
-    }
-
     private static boolean possibleInThatWay(List<Piece> actualPosition, Piece movePiece, Position move, Function<Position, Position> function) {
         Position movePosition = new Position(movePiece.getPosition().getColumn(), movePiece.getPosition().getRow());
         movePosition = function.apply(movePosition);
@@ -34,6 +28,16 @@ public class Rules {
         return true;
     }
 
+    private static boolean isAPieceThere(List<Piece> actualPosition, Position position, PieceColor color) {
+        for (Piece piece : actualPosition) {
+            if (piece.getPosition().equals(position) && piece.getColor() != color) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isMovePossible(List<Piece> actualPosition, Piece movePiece, Position move) {
         // ugyanolyan színű bábut ne lehessen "ütni"
         for (Piece piece : actualPosition) {
@@ -45,6 +49,19 @@ public class Rules {
         // "lólépés"
         if (movePiece.getType() == PieceType.KNIGHT) {
             return true;
+        }
+
+        // gyalog ütés
+        if (movePiece.getType() == PieceType.PAWN) {
+            Position diagonalPos = movePiece.getPosition().rightDiagonal(movePiece.getColor(), Direction.FORWARD);
+            if (diagonalPos != null && diagonalPos.equals(move)) {
+                return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());
+            }
+
+            diagonalPos = movePiece.getPosition().leftDiagonal(movePiece.getColor(), Direction.FORWARD);
+            if (diagonalPos != null && diagonalPos.equals(move)) {
+                return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());
+            }
         }
 
         int deltaRow = move.getRow() - movePiece.getPosition().getRow();
