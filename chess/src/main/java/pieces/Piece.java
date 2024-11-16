@@ -10,6 +10,7 @@ public abstract class Piece extends Component {
     protected PieceColor color; 
     transient protected Position position;
     protected String imageName;
+    protected PieceType type;
 
     public List<Position> getEveryMove() { return null; }
 
@@ -31,5 +32,9 @@ public abstract class Piece extends Component {
 
     public String toString() {
         return color + " " + position;
+    }
+
+    public PieceType getType() {
+        return type;
     }
 }

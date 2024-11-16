@@ -15,6 +15,8 @@ public class Bishop extends Piece {
         } else {
             this.imageName = "black_bishop.png";
         }
+
+        type = PieceType.BISHOP;
     }
 
     /*

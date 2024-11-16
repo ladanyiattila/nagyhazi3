@@ -20,6 +20,8 @@ public class Pawn extends Piece {
         } else {
             this.imageName = "black_pawn.png";
         }
+
+        type = PieceType.PAWN;
     }
 
     /*

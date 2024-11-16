@@ -15,6 +15,8 @@ public class King extends Piece {
         } else {
             this.imageName = "black_king.png";
         }
+
+        type = PieceType.KING;
     }
 
     /*

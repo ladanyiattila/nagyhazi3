@@ -15,6 +15,8 @@ public class Rook extends Piece {
         } else {
             this.imageName = "black_rook.png";
         }
+
+        type = PieceType.ROOK;
     }
 
     /*

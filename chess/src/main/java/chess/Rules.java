@@ -42,6 +42,11 @@ public class Rules {
             }
         }
 
+        // "lólépés"
+        if (movePiece.getType() == PieceType.KNIGHT) {
+            return true;
+        }
+
         int deltaRow = move.getRow() - movePiece.getPosition().getRow();
         int deltaColumn = move.getColumn() - movePiece.getPosition().getColumn();
 

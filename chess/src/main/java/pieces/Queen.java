@@ -15,6 +15,8 @@ public class Queen extends Piece {
         } else {
             this.imageName = "black_queen.png";
         }
+
+        type = PieceType.QUEEN;
     }
 
     /*

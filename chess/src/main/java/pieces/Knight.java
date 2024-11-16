@@ -15,6 +15,8 @@ public class Knight extends Piece {
         } else {
             this.imageName = "black_knight.png";
         }
+
+        type = PieceType.KNIGHT;
     }
 
     /*
