@@ -24,6 +24,12 @@ public class Board {
     private static List<Piece> actualPosition;
     private static DefaultTableModel tableModel;
     private static JTable boardTable;
+    private static PieceColor nextMoveColor;
+
+    static {
+        // fehér kezd
+        nextMoveColor = PieceColor.WHITE;
+    }
 
     public Board() {
         boardPanel = new JPanel();
@@ -128,8 +134,8 @@ public class Board {
             if (row >= 0 && column >= 0) {                
                 Position clickedPosition = new Position(column, 8 - row);
                 Piece pieceThere = getPieceInActualPosition(clickedPosition);
-                
-                if (pieceThere != null) {
+
+                if (pieceThere != null && pieceThere.getColor() == nextMoveColor) {
                     List<Position> allMoves = pieceThere.getEveryMove();
                     clickedPiece = pieceThere;
 
@@ -145,12 +151,28 @@ public class Board {
 
                     possibleMoves = allMoves;
                 } else if (isInPossibleMove(clickedPosition)) {
+                    ListIterator<Piece> iter = actualPosition.listIterator();
+
+                    while (iter.hasNext()) {
+                        Piece current = iter.next();
+
+                        if (current.getPosition().equals(clickedPosition)) {
+                            iter.remove();
+                            break;
+                        }
+                    }
+
                     for (Piece piece : actualPosition) {
                         if (clickedPiece.equals(piece)) {
                             piece.setPosition(new Position(clickedPosition.getColumn(), clickedPosition.getRow()));
                         }
                     }
 
+                    if (nextMoveColor == PieceColor.WHITE) {
+                        nextMoveColor = PieceColor.BLACK;
+                    } else {
+                        nextMoveColor = PieceColor.WHITE;
+                    }
 
                     clickedPiece.setPosition(clickedPosition);
                     possibleMoves = null;
