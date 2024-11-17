@@ -144,7 +144,7 @@ public class Board {
                     while (iter.hasNext()) {
                         Position current = iter.next();
                         
-                        if (!Rules.isMovePossible(actualPosition, pieceThere, current)) {
+                        if (!Rules.isMovePossible(actualPosition, pieceThere, current, nextMoveColor, true, true)) {
                             iter.remove();
                         }
                     }

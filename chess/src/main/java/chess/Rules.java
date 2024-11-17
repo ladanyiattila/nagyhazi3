@@ -1,13 +1,15 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.Function;
 import java.math.*;
 
 import pieces.*;
 
 public class Rules {
-    private static boolean possibleInThatWay(List<Piece> actualPosition, Piece movePiece, Position move, Function<Position, Position> function) {
+    private static boolean possibleInThatWay(List<Piece> actualPosition, Piece movePiece, Position move, Function<Position, Position> function, boolean checkForChecksAfterMove) {
         Position movePosition = new Position(movePiece.getPosition().getColumn(), movePiece.getPosition().getRow());
         movePosition = function.apply(movePosition);
 
@@ -24,7 +26,18 @@ public class Rules {
 
             movePosition = function.apply(movePosition);        
         }
-        
+
+        Piece king = null;
+        for (Piece piece : actualPosition) {
+            if (piece.getType() == PieceType.KING && piece.getColor() == movePiece.getColor()) {
+                king = piece;
+            }
+        }
+
+        if (checkForChecksAfterMove && isKingInCheckAfterMove(actualPosition, movePiece, move, king)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -38,7 +51,85 @@ public class Rules {
         return false;
     }
 
-    public static boolean isMovePossible(List<Piece> actualPosition, Piece movePiece, Position move) {
+    private static boolean isKingInCheckAfterMove(List<Piece> actualPosition, Piece movePiece, Position move, Piece king) {
+        List<Piece> actualPositionClone = new ArrayList<>();
+
+        for (Piece piece : actualPosition) {
+            actualPositionClone.add(piece);
+        }
+        
+        Position temp = movePiece.getPosition();
+
+        // történik-e ütés
+        Piece tempPiece = null;
+
+        ListIterator<Piece> iter = actualPositionClone.listIterator();
+
+        while (iter.hasNext()) {
+            Piece current = iter.next();
+
+            if (current.getPosition().equals(move)) {
+                tempPiece = current;
+                iter.remove();
+                break;
+            }
+        }
+
+        movePiece.setPosition(move);
+
+        if (!isKingInCheck(actualPositionClone, king, false)) {
+            movePiece.setPosition(temp);
+
+            if (tempPiece != null) {
+                actualPositionClone.add(tempPiece);
+            }
+
+            return false;
+        }
+
+        if (tempPiece != null) {
+            actualPositionClone.add(tempPiece);
+        }
+
+        movePiece.setPosition(temp);
+
+        return true;
+    }
+
+    private static boolean isKingInCheck(List<Piece> actualPosition, Piece king, boolean checkForChecksAfterMove) {
+        for (Piece piece : actualPosition) {
+            // király nem tud sakkot adni
+            if (piece.getType() != PieceType.KING && piece.getColor() != king.getColor()) {
+                List<Position> positions = piece.getEveryMove();
+
+                ListIterator<Position> iter = positions.listIterator();
+
+                while (iter.hasNext()) {
+                    Position current = iter.next();
+
+                    // gyalog lépésénél az előrét nem kell figyelembe venni
+                    if (piece.getType() == PieceType.PAWN && current.getColumn() == piece.getPosition().getColumn()) {
+                        iter.remove();
+                        continue;
+                    }
+                        
+                    if (!isMovePossible(actualPosition, piece, current, piece.getColor(), false, false)) {
+                        iter.remove();
+                    }
+                }
+
+                for (Position pos : positions) {
+                    if (pos.equals(king.getPosition())){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isMovePossible(List<Piece> actualPosition, Piece movePiece, Position move, PieceColor nextMoveColor, boolean checkForChecks, boolean checkForChecksAfterMove) {
         // ugyanolyan színű bábut ne lehessen "ütni"
         for (Piece piece : actualPosition) {
             if (piece.getPosition().equals(move) && movePiece.getColor() == piece.getColor()) {
@@ -46,9 +137,73 @@ public class Rules {
             }
         }
 
+        Piece king = null;
+        if (checkForChecks) {
+            for (Piece piece : actualPosition) {
+                if (piece.getType() == PieceType.KING && piece.getColor() == nextMoveColor) {
+                    king = piece;
+                }
+            }
+
+            if (isKingInCheck(actualPosition, king, false)) {
+                if (isMovePossible(actualPosition, movePiece, move, nextMoveColor, false, false)) {
+                    return !isKingInCheckAfterMove(actualPosition, movePiece, move, king);
+                }
+            }
+        }
+
+        
+        // király ne léphessen sakkba
+        if (movePiece.getType() == PieceType.KING && checkForChecksAfterMove) {
+            ArrayList<Position> opponentEveryMove = new ArrayList<>();
+
+            for (Piece piece : actualPosition) {
+                if (piece.getColor() != movePiece.getColor()) {
+                    for (Position pos : piece.getEveryMove()) {
+                        if (piece.getType() != PieceType.KING && !(piece.getType() == PieceType.PAWN
+                                && pos.getColumn() == piece.getPosition().getColumn()) && isMovePossible(actualPosition, piece, pos, piece.getColor(), false, true)) {
+                            opponentEveryMove.add(pos);
+                        }
+                    }
+                }
+            }
+
+            for (Position pos : opponentEveryMove) {
+                if (pos.equals(move)) {
+                    return false;
+                }
+            }
+        }
+
+        // király mellé ne lehessen belépni királlyal
+        if (movePiece.getType() == PieceType.KING) {
+            Piece enemyKing = null;
+            for (Piece piece : actualPosition) {
+                if (piece.getType() == PieceType.KING && piece.getColor() != movePiece.getColor()) {
+                    enemyKing = piece;
+                }
+            }
+
+            List<Position> enemyKingMoves = enemyKing.getEveryMove();
+
+            for (Position pos : enemyKingMoves) {
+                if (pos.equals(move)) {
+                    return false;
+                }
+            }
+        }
+
+
         // "lólépés"
         if (movePiece.getType() == PieceType.KNIGHT) {
-            return true;
+            king = null;
+            for (Piece piece : actualPosition) {
+                if (piece.getType() == PieceType.KING && piece.getColor() == movePiece.getColor()) {
+                    king = piece;
+                }
+            }
+
+            return !(checkForChecksAfterMove && isKingInCheckAfterMove(actualPosition, movePiece, move, king));
         }
 
         // gyalog ütés
@@ -75,7 +230,7 @@ public class Rules {
         // vízszintes mozgás jobbra
         if (deltaRow == 0 && deltaColumn > 0) {
             Function<Position, Position> right = x -> x.right(movePiece.getColor());
-            if (!possibleInThatWay(actualPosition, movePiece, move, right)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, right, checkForChecks)) {
                 return false;
             }
         }
@@ -83,7 +238,7 @@ public class Rules {
         // vízszintes mozgás balra
         if (deltaRow == 0 && deltaColumn < 0) {
             Function<Position, Position> left = x -> x.left(movePiece.getColor());        
-            if (!possibleInThatWay(actualPosition, movePiece, move, left)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, left, checkForChecks)) {
                 return false;
             } 
         }
@@ -91,7 +246,17 @@ public class Rules {
         // függőleges mozgás felfelé
         if (deltaRow > 0 && deltaColumn == 0) {
             Function<Position, Position> forward = x -> x.forward(movePiece.getColor());
-            if (!possibleInThatWay(actualPosition, movePiece, move, forward)) {
+
+            // előre ne lehessen ütni gyaloggal
+            if (movePiece.getType() == PieceType.PAWN) {
+                for (Piece piece : actualPosition) {
+                    if (piece.getPosition().equals(move)) {
+                        return false;
+                    }
+                }
+            }
+
+            if (!possibleInThatWay(actualPosition, movePiece, move, forward, checkForChecks)) {
                 return false;
             }
         }
@@ -99,7 +264,7 @@ public class Rules {
         // függőleges mozgás lefelé
         if (deltaRow < 0 && deltaColumn == 0) {
             Function<Position, Position> backward = x -> x.backwards(movePiece.getColor());
-            if (!possibleInThatWay(actualPosition, movePiece, move, backward)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, backward, checkForChecks)) {
                 return false;
             }
         }
@@ -107,7 +272,7 @@ public class Rules {
         // keresztbe mozgás felfelé jobbra
         if (deltaRow > 0 && deltaColumn > 0) {
             Function<Position, Position> rightDiagonal = x -> x.rightDiagonal(movePiece.getColor(), Direction.FORWARD);
-            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal, checkForChecks)) {
                 return false;
             }
         }
@@ -115,7 +280,7 @@ public class Rules {
         // keresztbe mozgás lefelé jobbra
         if (deltaRow < 0 && deltaColumn < 0) {
             Function<Position, Position> rightDiagonal = x -> x.rightDiagonal(movePiece.getColor(), Direction.BACKWARD);
-            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal, checkForChecks)) {
                 return false;
             }
         }
@@ -123,7 +288,7 @@ public class Rules {
         // keresztbe mozgás felfelé balra
         if (deltaRow > 0 && deltaColumn < 0) {
             Function<Position, Position> leftDiagonal = x -> x.leftDiagonal(movePiece.getColor(), Direction.FORWARD);
-            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal, checkForChecks)) {
                 return false;
             }
         }
@@ -131,7 +296,7 @@ public class Rules {
         // keresztbe mozgás lefelé balra
         if (deltaRow < 0 && deltaColumn > 0) {
             Function<Position, Position> leftDiagonal = x -> x.leftDiagonal(movePiece.getColor(), Direction.BACKWARD);
-            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal)) {
+            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal, checkForChecks)) {
                 return false;
             }
         }
