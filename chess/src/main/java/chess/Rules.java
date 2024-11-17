@@ -303,4 +303,34 @@ public class Rules {
 
         return true;
     }
+
+    public static String getEndOfGame(List<Piece> actualPosition, PieceColor color) {
+        ArrayList<Position> everyMove = new ArrayList<>();
+
+        Piece king = null;
+        for (Piece piece : actualPosition) {
+            if (piece.getColor() == color) {
+                for (Position pos : piece.getEveryMove()) {
+                    if (isMovePossible(actualPosition, piece, pos, color, true, true)) {
+                        everyMove.add(pos);
+                    }
+                }
+
+                if (piece.getType() == PieceType.KING) {
+                    king = piece;
+                }
+            }
+        }
+
+        // ha nincs több szabályos lépés és sakkban van a király, akkor matt
+        if (everyMove.isEmpty() && isKingInCheck(actualPosition, king, true)) {
+            return "CHECKMATE";
+        } else if (everyMove.isEmpty() && !isKingInCheck(actualPosition, king, true)) {
+            // ha nincs több szabályos lépés, de nincs sakkban a király, akkor patt
+            return "STALEMATE";
+        }
+
+        return "NOT_FINISHED";
+
+    }
 }

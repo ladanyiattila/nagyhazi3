@@ -1,11 +1,17 @@
 package chess;
 
 import javax.swing.*;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Label;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.io.File;
 
@@ -19,7 +25,7 @@ import java.util.*;
 import pieces.*;
 
 public class Board {
-    private JPanel boardPanel;
+    private static JPanel boardPanel;
     private static String[] columns = { "", "A", "B", "C", "D", "E", "F", "G", "H" };
     private static List<Piece> actualPosition;
     private static DefaultTableModel tableModel;
@@ -34,7 +40,6 @@ public class Board {
     public Board() {
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(675, 750));
-        boardPanel.setBackground(Color.red);
 
         String[][] rows = new String[9][9];
         tableModel = new DefaultTableModel(rows, columns);
@@ -55,7 +60,8 @@ public class Board {
         boardTable.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         for (int i = 0; i < 9; i++) {
-            boardTable.getColumnModel().getColumn(i).setCellRenderer(new CellRenderer());
+            CellRenderer renderer = new CellRenderer();
+            boardTable.getColumnModel().getColumn(i).setCellRenderer(renderer);
         }
 
         boardTable.addMouseListener(new ClickedOnTable());        
@@ -125,6 +131,50 @@ public class Board {
         return false;
     }
 
+    private static void checkBoardAfterEveryMove() {
+        String state = Rules.getEndOfGame(actualPosition, nextMoveColor);
+
+        if (!state.equals("NOT_FINISHED")) {
+            JFrame endOfGame = new JFrame();
+            endOfGame.setSize(400, 200);
+            endOfGame.setResizable(false);
+            endOfGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            endOfGame.setTitle("Chess");
+            endOfGame.setLayout(new BorderLayout());
+
+            JPanel textPanel = new JPanel();
+            textPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            textPanel.setPreferredSize(new Dimension(400, 300));
+
+            JLabel label = new JLabel();
+            String text = "End of game by " + state;
+            label.setText(text);
+            label.setFont(new Font("Arial", 0, 20));
+            textPanel.add(label);
+
+            if (state.equals("CHECKMATE")) {
+                JLabel winner = new JLabel("The winner is: " + (nextMoveColor == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE));
+                System.out.println(winner.getText());
+                winner.setFont(new Font("Arial", 0, 20));
+                textPanel.add(winner);
+            }
+
+        
+            JButton button = new JButton("Back to main menu");
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    boardPanel.setVisible(false);
+                    endOfGame.setVisible(false);
+                    Program.startProgram();
+                }
+            });
+
+            endOfGame.add(textPanel, BorderLayout.NORTH);
+            endOfGame.add(button, BorderLayout.SOUTH);
+            endOfGame.setVisible(true);
+        }
+    }
+
     class ClickedOnTable extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -183,6 +233,8 @@ public class Board {
 
                 boardTable.repaint();
             }
+
+            checkBoardAfterEveryMove();
         }
     }
 
@@ -195,7 +247,7 @@ public class Board {
             }
 
             if (column == 0) {
-                JLabel label = new JLabel(Integer.toString(8 - row));
+                JLabel label = new JLabel("        " + Integer.toString(8 - row));
                 label.setOpaque(true);
                 label.setForeground(Color.black);
                 label.setBackground(Color.white);
@@ -205,7 +257,7 @@ public class Board {
 
             if (row == 8) {
                 Position pos = new Position(column, row + 1);
-                JLabel label = new JLabel(pos.columnToString().toUpperCase());
+                JLabel label = new JLabel("        " + pos.columnToString().toUpperCase());
                 label.setOpaque(true);
                 label.setForeground(Color.black);
                 label.setBackground(Color.white);

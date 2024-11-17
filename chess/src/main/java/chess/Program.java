@@ -12,8 +12,14 @@ public class Program {
 
     private static JFrame mainFrame;
 
+    static {
+        mainFrame = null;
+    }
+
     public static void startProgram() {
-        mainFrame = new JFrame();
+        if (mainFrame == null) {
+            mainFrame = new JFrame();
+        }
 
         mainFrame.setSize(500, 500);
         mainFrame.setResizable(false);
@@ -83,7 +89,8 @@ public class Program {
         exitGameButton.setPreferredSize(new Dimension(150, 25));
         exitGameButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                return;
+                mainFrame.setVisible(false);
+                System.exit(0);
             }
         });
 
@@ -113,20 +120,35 @@ public class Program {
         movesText.setLineWrap(true);
         movesText.setWrapStyleWord(true);
 
-        String s = "";
-
-        for (int i = 0; i < 200; i++) {
-            movesText.append("verylongtext" + Integer.toString(i) + " ");
-        }
-
         // a doboz tartalma görgethető legyen
         JScrollPane movesScroll = new JScrollPane(movesText);
         movesScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         movesScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
+        JPanel bottomJPanel = new JPanel();
+        bottomJPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
+
+        JButton backToMainMenu = new JButton("Back to main menu");
+        backToMainMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                board.getBoardPanel().setVisible(false);
+                Program.startProgram();
+            }
+        });
+        bottomJPanel.add(backToMainMenu);
+
+        JButton saveGame = new JButton("Save game");
+        saveGame.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("TODO");
+            }
+        });
+        bottomJPanel.add(saveGame);
+
 
         mainFrame.add(board.getBoardPanel(), BorderLayout.WEST);
         mainFrame.add(movesScroll, BorderLayout.EAST);
+        mainFrame.add(bottomJPanel, BorderLayout.SOUTH);
         mainFrame.setVisible(true);
     }
 
