@@ -37,7 +37,7 @@ public class Board {
         nextMoveColor = PieceColor.WHITE;
     }
 
-    public Board() {
+    public Board(List<Piece> startingPos) {
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(675, 750));
 
@@ -50,7 +50,11 @@ public class Board {
             }
         };
 
-        actualPosition = getStartingPosition();
+        if (startingPos == null) {
+            actualPosition = getStartingPosition();
+        } else {
+            actualPosition = startingPos;
+        }
 
         boardTable.setRowHeight(75);
 
@@ -70,7 +74,7 @@ public class Board {
     }
 
 
-    private static List<Piece> getStartingPosition() {
+    public static List<Piece> getStartingPosition() {
         List<Piece> pieces = new ArrayList<>();
 
         // sötét bábuk

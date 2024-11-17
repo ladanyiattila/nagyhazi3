@@ -1,7 +1,13 @@
 package chess;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.*;
+import java.util.List;
+
 import javax.swing.*;
 
 import chess.*;
@@ -71,7 +77,7 @@ public class Program {
                 titlePanel.setVisible(false);
                 authorPanel.setVisible(false);
                 bottomPanel.setVisible(false);
-                startGame();
+                startGame(null, "");
             }
         });
 
@@ -109,10 +115,10 @@ public class Program {
         mainFrame.setVisible(true);
     }
 
-    private static void startGame() {
+    private static void startGame(List<Piece> startingPos, String movesListed) {
         mainFrame.setSize(1000, 750);
 
-        Board board = new Board();
+        Board board = new Board(startingPos);
 
         JTextArea movesText = new JTextArea();
         movesText.setSize(new Dimension(300, 400));
@@ -120,6 +126,8 @@ public class Program {
         movesText.setEditable(false);
         movesText.setLineWrap(true);
         movesText.setWrapStyleWord(true);
+        movesText.setText(movesListed);
+        movesText.repaint();
 
         // a doboz tartalma görgethető legyen
         JScrollPane movesScroll = new JScrollPane(movesText);
@@ -156,7 +164,7 @@ public class Program {
     private static void readTextFile() {
         JPanel textJPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         textJPanel.setPreferredSize(new Dimension(500, 100));
-        
+
         JLabel titleLabel = new JLabel();
         titleLabel.setText("Load game");
         titleLabel.setFont(new Font("Arial", 0, 30));
@@ -176,17 +184,6 @@ public class Program {
 
         JPanel entryPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        JTextField textField = new JTextField(30);
-        entryPanel.add(textField);
-
-        JButton button = new JButton("LOAD");
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("TODO");
-            }
-        });
-        entryPanel.add(button);
-
         JPanel backToMenuPanel = new JPanel();
 
         JButton backToMenuButton = new JButton("Back to main menu");
@@ -199,6 +196,33 @@ public class Program {
             }
         });
         backToMenuPanel.add(backToMenuButton);
+
+        JTextField textField = new JTextField(30);
+        entryPanel.add(textField);
+
+        JButton button = new JButton("LOAD");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    List<Piece> list = PGN_Formatter.readFromTextFile(textField.getText());
+
+                    textJPanel.setVisible(false);
+                    entryPanel.setVisible(false);
+                    backToMenuPanel.setVisible(false);
+
+                    if (list.isEmpty()) {
+                        startGame(null, PGN_Formatter.getMovesListed(textField.getText()));
+                    } else {
+                        startGame(list, PGN_Formatter.getMovesListed(textField.getText()));
+                    }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+        });
+        entryPanel.add(button);
+
+        
 
 
         mainFrame.add(textJPanel, BorderLayout.NORTH);
