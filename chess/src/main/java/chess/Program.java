@@ -81,6 +81,7 @@ public class Program {
             public void actionPerformed(ActionEvent e) {
                 titlePanel.setVisible(false);
                 bottomPanel.setVisible(false);
+                authorPanel.setVisible(false);
                 readTextFile();
             }
         });
@@ -153,7 +154,57 @@ public class Program {
     }
 
     private static void readTextFile() {
-        // TODO
-        ;
+        JPanel textJPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        textJPanel.setPreferredSize(new Dimension(500, 100));
+        
+        JLabel titleLabel = new JLabel();
+        titleLabel.setText("Load game");
+        titleLabel.setFont(new Font("Arial", 0, 30));
+        titleLabel.setForeground(Color.black);
+        textJPanel.add(titleLabel);
+
+        JLabel descriptionLabel = new JLabel();
+        descriptionLabel.setText("Enter the .txt file's name which contains the game you would like to load.");
+        descriptionLabel.setFont(new Font("Arial", 0, 14));
+        descriptionLabel.setForeground(Color.black);
+        textJPanel.add(descriptionLabel);
+
+        JLabel noteLabel = new JLabel("(Note: the file must be in the saved_games folder)");
+        noteLabel.setFont(new Font("Arial", 0, 12));
+        noteLabel.setForeground(Color.gray);
+        textJPanel.add(noteLabel);
+
+        JPanel entryPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+        JTextField textField = new JTextField(30);
+        entryPanel.add(textField);
+
+        JButton button = new JButton("LOAD");
+        button.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("TODO");
+            }
+        });
+        entryPanel.add(button);
+
+        JPanel backToMenuPanel = new JPanel();
+
+        JButton backToMenuButton = new JButton("Back to main menu");
+        backToMenuButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textJPanel.setVisible(false);
+                entryPanel.setVisible(false);
+                backToMenuPanel.setVisible(false);
+                startProgram();
+            }
+        });
+        backToMenuPanel.add(backToMenuButton);
+
+
+        mainFrame.add(textJPanel, BorderLayout.NORTH);
+        mainFrame.add(entryPanel, BorderLayout.CENTER);
+        mainFrame.add(backToMenuPanel, BorderLayout.SOUTH);
+
+        mainFrame.setVisible(true);
     }
 }
