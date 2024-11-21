@@ -17,6 +17,7 @@ public class Knight extends Piece {
         }
 
         type = PieceType.KNIGHT;
+        inStartingPosition = true;
     }
 
     /*

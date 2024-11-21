@@ -22,6 +22,7 @@ public class Pawn extends Piece {
         }
 
         type = PieceType.PAWN;
+        inStartingPosition = true;
     }
 
     /*

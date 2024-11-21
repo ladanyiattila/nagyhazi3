@@ -17,6 +17,7 @@ public class Bishop extends Piece {
         }
 
         type = PieceType.BISHOP;
+        inStartingPosition = true;
     }
 
     /*

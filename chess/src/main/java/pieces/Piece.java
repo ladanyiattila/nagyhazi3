@@ -11,6 +11,7 @@ public abstract class Piece extends Component {
     transient protected Position position;
     protected String imageName;
     protected PieceType type;
+    protected boolean inStartingPosition;
 
     public List<Position> getEveryMove() { return null; }
 
@@ -36,5 +37,13 @@ public abstract class Piece extends Component {
 
     public PieceType getType() {
         return type;
+    }
+
+    public void pieceHasMoved() {
+        inStartingPosition = false;
+    }
+
+    public boolean hasPieceMoved() {
+        return !inStartingPosition;
     }
 }
