@@ -396,6 +396,8 @@ public class Rules {
             return !(checkForChecksAfterMove && isKingInCheckAfterMove(actualPosition, movePiece, move, king));
         }
 
+        // TODO: en passant
+
         // gyalog ütés
         if (movePiece.getType() == PieceType.PAWN) {
             Position diagonalPos = movePiece.getPosition().rightDiagonal(movePiece.getColor(), Direction.FORWARD);
