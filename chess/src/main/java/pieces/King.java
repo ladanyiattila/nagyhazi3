@@ -17,6 +17,7 @@ public class King extends Piece {
         }
 
         type = PieceType.KING;
+        inStartingPosition = true;
     }
 
     /*
@@ -65,6 +66,17 @@ public class King extends Piece {
         move = position.leftDiagonal(color, Direction.BACKWARD);
         if (move != null) {
             positions.add(move);
+        }
+
+        // sáncolás (a király még nem mozdult meg az alap pozícióból)
+        if (this.inStartingPosition) {
+            if (this.color == PieceColor.WHITE && this.getPosition().equals(new Position("e", 1))) {
+                positions.add(new Position("g", 1));
+                positions.add(new Position("c", 1));
+            } else if (this.color == PieceColor.BLACK && this.getPosition().equals(new Position("e", 8))) {
+                positions.add(new Position("g", 8));
+                positions.add(new Position("c", 8));
+            }   
         }
 
         return positions;

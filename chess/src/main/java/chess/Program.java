@@ -1,11 +1,13 @@
 package chess;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.*;
@@ -77,7 +79,7 @@ public class Program {
                 titlePanel.setVisible(false);
                 authorPanel.setVisible(false);
                 bottomPanel.setVisible(false);
-                startGame(null, "");
+                startGame(null, "", 1);
             }
         });
 
@@ -115,10 +117,8 @@ public class Program {
         mainFrame.setVisible(true);
     }
 
-    private static void startGame(List<Piece> startingPos, String movesListed) {
+    private static void startGame(List<Piece> startingPos, String movesListed, int numberOfMoves) {
         mainFrame.setSize(1000, 750);
-
-        Board board = new Board(startingPos);
 
         JTextArea movesText = new JTextArea();
         movesText.setSize(new Dimension(300, 400));
@@ -126,13 +126,14 @@ public class Program {
         movesText.setEditable(false);
         movesText.setLineWrap(true);
         movesText.setWrapStyleWord(true);
-        movesText.setText(movesListed);
-        movesText.repaint();
+        SwingUtilities.invokeLater(() -> movesText.setText(movesListed));
 
         // a doboz tartalma görgethető legyen
         JScrollPane movesScroll = new JScrollPane(movesText);
         movesScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         movesScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        Board board = new Board(startingPos, movesListed, numberOfMoves, movesText);
 
         JPanel bottomJPanel = new JPanel();
         bottomJPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
@@ -149,7 +150,13 @@ public class Program {
         JButton saveGame = new JButton("Save game");
         saveGame.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("TODO");
+                try {
+                    PGN_Formatter.saveGame(movesText.getText());
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
+                board.getBoardPanel().setVisible(false);
+                Program.startProgram();
             }
         });
         bottomJPanel.add(saveGame);
@@ -211,24 +218,58 @@ public class Program {
                     backToMenuPanel.setVisible(false);
 
                     if (list.isEmpty()) {
-                        startGame(null, PGN_Formatter.getMovesListed(textField.getText()));
+                        startGame(null, PGN_Formatter.getMovesListed(textField.getText()), 1);
                     } else {
-                        startGame(list, PGN_Formatter.getMovesListed(textField.getText()));
+                        System.out.println("lepesszam: " + PGN_Formatter.getNumberOfMoves(textField.getText()));
+                        startGame(list, PGN_Formatter.getMovesListed(textField.getText()), PGN_Formatter.getNumberOfMoves(textField.getText()));
                     }
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    errorWhenLoadingGame();
                 }
             }
         });
         entryPanel.add(button);
-
-        
-
 
         mainFrame.add(textJPanel, BorderLayout.NORTH);
         mainFrame.add(entryPanel, BorderLayout.CENTER);
         mainFrame.add(backToMenuPanel, BorderLayout.SOUTH);
 
         mainFrame.setVisible(true);
+    }
+
+    private static void errorWhenLoadingGame() {
+        JFrame errorFrame = new JFrame("Error");
+        errorFrame.setSize(400, 200);
+        errorFrame.setResizable(false);
+        errorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        errorFrame.setLayout(new BorderLayout());
+
+        JLabel label = new JLabel("Error when loading game:");
+        label.setFont(new Font("Arial", 0, 14));
+        label.setForeground(Color.red);
+
+        JLabel label2 = new JLabel("file not found in saved_games directory");
+        label2.setFont(new Font("Arial", 0, 14));
+        label2.setForeground(Color.red);
+
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(400, 100));
+        panel.add(label);
+        panel.add(label2);
+
+        JButton backToMainMenu = new JButton("Back to main menu");
+        backToMainMenu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                panel.setVisible(false);
+                backToMainMenu.setVisible(false);
+                errorFrame.setVisible(false);
+                Program.startProgram();
+            }
+        });
+        
+        errorFrame.add(panel, BorderLayout.NORTH);
+        errorFrame.add(backToMainMenu, BorderLayout.SOUTH);
+
+        errorFrame.setVisible(true);
     }
 }

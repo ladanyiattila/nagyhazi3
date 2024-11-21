@@ -17,6 +17,7 @@ public class Queen extends Piece {
         }
 
         type = PieceType.QUEEN;
+        inStartingPosition = true;
     }
 
     /*

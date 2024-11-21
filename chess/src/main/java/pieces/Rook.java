@@ -17,6 +17,7 @@ public class Rook extends Piece {
         }
 
         type = PieceType.ROOK;
+        inStartingPosition = true;
     }
 
     /*

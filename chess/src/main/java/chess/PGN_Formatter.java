@@ -3,9 +3,15 @@ package chess;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -46,6 +52,24 @@ public class PGN_Formatter {
         }};
 
         return map.get(letter);
+    }
+
+    private static String getLetterByPieceType(PieceType type) {
+        if (type == PieceType.PAWN) {
+            return "";
+        }
+
+        Map<PieceType, String> map = new HashMap<>() {
+            {
+                put(PieceType.QUEEN, "Q");
+                put(PieceType.KING, "K");
+                put(PieceType.BISHOP, "B");
+                put(PieceType.ROOK, "R");
+                put(PieceType.KNIGHT, "N");
+            }
+        };
+
+        return map.get(type);
     }
 
     private static List<Piece> getOfficers(PieceColor color, PieceType type) {
@@ -169,7 +193,9 @@ public class PGN_Formatter {
                 Piece rook = getPiece(nextColor, PieceType.ROOK, new Position("h", row));
 
                 king.setPosition(new Position("g", row));
+                king.pieceHasMoved();
                 rook.setPosition(new Position("f", row));
+                rook.pieceHasMoved();
                 continue;
             }
 
@@ -185,7 +211,9 @@ public class PGN_Formatter {
                 Piece rook = getPiece(nextColor, PieceType.ROOK, new Position("a", row));
 
                 king.setPosition(new Position("c", row));
+                king.pieceHasMoved();
                 rook.setPosition(new Position("d", row));
+                rook.pieceHasMoved();
                 continue;
             }
 
@@ -205,6 +233,7 @@ public class PGN_Formatter {
                     deletePiece(new Position(column, row));
 
                     movePiece.setPosition(new Position(column, row));
+                    movePiece.pieceHasMoved();
                 } else {
                     List<Piece> officers = getOfficers(nextColor, movePieceType);
 
@@ -217,13 +246,16 @@ public class PGN_Formatter {
                             deletePiece(new Position(column, row));
 
                             officers.get(0).setPosition(new Position(column, row));
+                            officers.get(0).pieceHasMoved();
                         } else {
                             deletePiece(new Position(column, row));
 
                             if (containsMove(getPossibleMoves(officers.get(0)), new Position(column, row))) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         }
                     } else {
@@ -237,14 +269,18 @@ public class PGN_Formatter {
                         if (Character.isDigit(specified)) {
                             if (officers.get(0).getPosition().getRow() == Character.getNumericValue(specified)) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         } else { // oszlop esetén
                             if (officers.get(0).getPosition().columnToString().equals(Character.toString(specified))) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         }
                     }
@@ -264,6 +300,7 @@ public class PGN_Formatter {
                     }
 
                     movePiece.setPosition(new Position(column, row));
+                    movePiece.pieceHasMoved();
                 } else {
                     List<Piece> officers = getOfficers(nextColor, movePieceType);
 
@@ -274,11 +311,14 @@ public class PGN_Formatter {
 
                         if (officers.size() == 1) {
                             officers.get(0).setPosition(new Position(column, row));
+                            officers.get(0).pieceHasMoved();
                         } else {
                             if (containsMove(getPossibleMoves(officers.get(0)), new Position(column, row))) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         }
                     } else {
@@ -290,14 +330,18 @@ public class PGN_Formatter {
                         if (Character.isDigit(specified)) {
                             if (officers.get(0).getPosition().getRow() == Character.getNumericValue(specified)) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         } else { // oszlop esetén
                             if (officers.get(0).getPosition().columnToString().equals(Character.toString(specified))) {
                                 officers.get(0).setPosition(new Position(column, row));
+                                officers.get(0).pieceHasMoved();
                             } else {
                                 officers.get(1).setPosition(new Position(column, row));
+                                officers.get(1).pieceHasMoved();
                             }
                         }
                     }
@@ -307,4 +351,116 @@ public class PGN_Formatter {
 
         return loadedPosition;
     }
+
+    private static boolean isInPossibleMoves(Piece piece, Position move, List<Piece> actualPosition) {
+        List<Position> possibleMoves = piece.getEveryMove();
+        ListIterator<Position> iter = possibleMoves.listIterator();
+
+        while (iter.hasNext()) {
+            Position current = iter.next(); 
+
+            if (!Rules.isMovePossible(actualPosition, piece, current, piece.getColor(), true, true)) {
+                iter.remove();
+            }
+        }
+
+        for (Position pos : possibleMoves) {
+            if (pos.equals(move)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static String getMoveFormatted(Piece piece, Position movedTo, boolean wasPieceTaken, List<Piece> actualPosition) {
+        loadedPosition = actualPosition;
+        String move = "";
+
+        if (piece.getType() == PieceType.KING && (piece.getPosition().equals(new Position("e", 1)) || piece.getPosition().equals(new Position("e", 8)))) {
+            if (movedTo.equals(new Position("g", 1)) || movedTo.equals(new Position("g", 8))) {
+                return "O-O";
+            } else if (movedTo.equals(new Position("c", 1)) || movedTo.equals(new Position("c", 8))) {
+                return "O-O-O";
+            }
+        }
+
+        if (piece.getType() == PieceType.PAWN) {
+            if (wasPieceTaken) {
+                move += piece.getPosition().columnToString() + "x" + movedTo;
+            } else {
+                move += movedTo;
+            }
+        } else {
+            List<Piece> officers = getOfficers(piece.getColor(), piece.getType());
+
+            // első betű a tiszt típusa
+            move += getLetterByPieceType(piece.getType());
+
+            if (officers.size() == 2 && isInPossibleMoves(officers.get(0), movedTo, actualPosition) 
+            && isInPossibleMoves(officers.get(1), movedTo, actualPosition)) {
+                // ha mindkét tiszt odaléphet, akkor nem egyértelmű
+                if (officers.get(0).getPosition().getRow() == officers.get(1).getPosition().getRow()) {
+                    move += piece.getPosition().columnToString();
+                } else if (officers.get(0).getPosition().getColumn() == officers.get(1).getPosition().getColumn()) {
+                    move += piece.getPosition().getRow();
+                } else {
+                    move += piece.getPosition().columnToString();
+                }
+            }
+
+            if (wasPieceTaken) {
+                move += "x";
+            }
+
+            move += movedTo.toString();
+        }
+
+        return move;
+    }
+
+    public static void saveGame(String moveList) throws IOException {
+        LocalDateTime date = LocalDateTime.now();
+
+        BufferedWriter file = new BufferedWriter(new FileWriter("saved_games/" + date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm-ss")) + ".txt"));
+
+        int idx = 0;
+
+        for (char c : moveList.toCharArray()) {
+            if (c != '\n') {
+                file.write(c);
+            } else {
+                file.write(" ");
+            }
+        }
+
+        file.close();
+    }
+
+    public static int getNumberOfMoves(String textFile) throws FileNotFoundException {
+        File readFile = null;
+
+        if (!textFile.contains(".txt")) {
+            readFile = new File("saved_games/" + textFile + ".txt");
+        } else {
+            readFile = new File("saved_games/" + textFile);
+        }
+
+        Scanner scanner = new Scanner(readFile);
+
+        String line = scanner.nextLine();
+        System.out.println(line);
+        int numberOfNewLine = 0;
+
+        for (char c : line.toCharArray()) {
+            if (c == '.') {
+                numberOfNewLine++;
+            }
+        }
+
+        scanner.close();
+
+        return numberOfNewLine + 1;
+    }
+
 }

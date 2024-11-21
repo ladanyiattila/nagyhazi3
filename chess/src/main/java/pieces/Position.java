@@ -149,7 +149,7 @@ public class Position {
     }
 
     public String toString() {
-        return columnToString() + " " + row;
+        return columnToString() + row;
     }
 
     public int getColumn() {

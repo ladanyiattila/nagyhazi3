@@ -31,13 +31,20 @@ public class Board {
     private static DefaultTableModel tableModel;
     private static JTable boardTable;
     private static PieceColor nextMoveColor;
+    private static JFrame endOfGame;
+    private static String movesListed;
+    private static int numberOfMoves;
+    private static JTextArea movesTextArea;
 
     static {
         // fehér kezd
         nextMoveColor = PieceColor.WHITE;
+
+        // ne lehessen többször megnyitni az ablakot
+        endOfGame = null;
     }
 
-    public Board(List<Piece> startingPos) {
+    public Board(List<Piece> startingPos, String movesListed, int numberOfMoves, JTextArea movesTextArea) {
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(675, 750));
 
@@ -49,6 +56,10 @@ public class Board {
                 return false;
             }
         };
+
+        this.movesListed = movesListed;
+        this.numberOfMoves = numberOfMoves;
+        this.movesTextArea = movesTextArea;
 
         if (startingPos == null) {
             actualPosition = getStartingPosition();
@@ -139,7 +150,9 @@ public class Board {
         String state = Rules.getEndOfGame(actualPosition, nextMoveColor);
 
         if (!state.equals("NOT_FINISHED")) {
-            JFrame endOfGame = new JFrame();
+            if (endOfGame == null) {
+                endOfGame = new JFrame();
+            }
             endOfGame.setSize(400, 200);
             endOfGame.setResizable(false);
             endOfGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -158,7 +171,6 @@ public class Board {
 
             if (state.equals("CHECKMATE")) {
                 JLabel winner = new JLabel("The winner is: " + (nextMoveColor == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE));
-                System.out.println(winner.getText());
                 winner.setFont(new Font("Arial", 0, 20));
                 textPanel.add(winner);
             }
@@ -177,6 +189,23 @@ public class Board {
             endOfGame.add(button, BorderLayout.SOUTH);
             endOfGame.setVisible(true);
         }
+    }
+
+    private static void addMove(String move) {
+        if (nextMoveColor == PieceColor.WHITE) {
+            movesListed += numberOfMoves + "." + move + " ";
+        } else {
+            movesListed += move + "\n";
+            numberOfMoves++;
+        }
+
+        System.out.println(movesListed);
+        movesTextArea.repaint();
+        movesTextArea.setText(movesListed);
+    }
+
+    public static String getMovesListedVariable() {
+        return movesListed;
     }
 
     class ClickedOnTable extends MouseAdapter {
@@ -206,19 +235,25 @@ public class Board {
                     possibleMoves = allMoves;
                 } else if (isInPossibleMove(clickedPosition)) {
                     ListIterator<Piece> iter = actualPosition.listIterator();
+                    boolean wasPieceTaken = false;
 
                     while (iter.hasNext()) {
                         Piece current = iter.next();
 
                         if (current.getPosition().equals(clickedPosition)) {
                             iter.remove();
+                            wasPieceTaken = true;
                             break;
                         }
                     }
 
+                    Position movedTo = new Position(clickedPosition.getColumn(), clickedPosition.getRow());
+
+                    addMove(PGN_Formatter.getMoveFormatted(clickedPiece, movedTo, wasPieceTaken, actualPosition));
+
                     for (Piece piece : actualPosition) {
                         if (clickedPiece.equals(piece)) {
-                            piece.setPosition(new Position(clickedPosition.getColumn(), clickedPosition.getRow()));
+                            piece.setPosition(movedTo);
                         }
                     }
 
@@ -229,6 +264,56 @@ public class Board {
                     }
 
                     clickedPiece.setPosition(clickedPosition);
+                    clickedPiece.pieceHasMoved();
+
+                    // sáncolás
+                    if (clickedPiece.getType() == PieceType.KING) {
+                        if (clickedPiece.getColor() == PieceColor.WHITE) {
+                            // rövid
+                            if (movedTo.equals(new Position("g", 1))) {
+                                for (Piece piece : actualPosition) {
+                                    if (piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("h", 1))) {
+                                        piece.setPosition(new Position("f", 1));
+                                        piece.pieceHasMoved();
+                                    }
+                                }
+                            }
+
+                            // hosszú
+                            if (movedTo.equals(new Position("c", 1))) {
+                                for (Piece piece : actualPosition) {
+                                    if (piece.getType() == PieceType.ROOK
+                                            && piece.getPosition().equals(new Position("a", 1))) {
+                                        piece.setPosition(new Position("d", 1));
+                                        piece.pieceHasMoved();
+                                    }
+                                }
+                            }   
+                        } else {
+                            // rövid
+                            if (movedTo.equals(new Position("g", 8))) {
+                                for (Piece piece : actualPosition) {
+                                    if (piece.getType() == PieceType.ROOK
+                                            && piece.getPosition().equals(new Position("h", 8))) {
+                                        piece.setPosition(new Position("f", 8));
+                                        piece.pieceHasMoved();
+                                    }
+                                }
+                            }
+
+                            // hosszú
+                            if (movedTo.equals(new Position("c", 8))) {
+                                for (Piece piece : actualPosition) {
+                                    if (piece.getType() == PieceType.ROOK
+                                            && piece.getPosition().equals(new Position("a", 8))) {
+                                        piece.setPosition(new Position("d", 8));
+                                        piece.pieceHasMoved();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     possibleMoves = null;
                 } else {
                     possibleMoves = null;

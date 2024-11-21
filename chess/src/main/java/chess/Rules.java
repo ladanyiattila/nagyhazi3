@@ -193,6 +193,196 @@ public class Rules {
             }
         }
 
+        // sáncolás
+        if (movePiece.getType() == PieceType.KING && (move.equals(new Position("g", 1)) 
+        || move.equals(new Position("c", 1))) || move.equals(new Position("g", 8)) || move.equals(new Position("c", 8))) {
+            if (movePiece.getColor() == PieceColor.WHITE) {
+                // rövidsánc
+                if (move.equals(new Position("g", 1))) {
+                    List<Position> allEnemyMoves = new ArrayList<>();
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.BLACK) {
+                            List<Position> pieceMoveList = piece.getEveryMove();
+
+                            for (Position position : pieceMoveList) {
+                                if (piece.getType() == PieceType.KING && (position.equals(new Position("g", 8)) || position.equals(new Position("c", 8)))) {
+                                    continue;
+                                }
+
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                    allEnemyMoves.add(position);
+                                }
+                            }
+                        }
+                    }
+
+                    if (isKingInCheck(actualPosition, movePiece, false)) {
+                        return false;
+                    }
+
+                    // nem tud egyik ellenfél bábu oda lépni
+                    for (Position position : allEnemyMoves) {
+                        if (position.equals(new Position("f", 1)) || position.equals(new Position("g", 1))) {
+                            return false;
+                        }
+                    }
+
+                    // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+                    if (movePiece.hasPieceMoved()) {
+                        return false;
+                    }
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.WHITE && piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("h", 1))) {
+                            if (piece.hasPieceMoved()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                } else if (move.equals(new Position("c", 1))) { // hosszúsánc
+                    List<Position> allEnemyMoves = new ArrayList<>();
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.BLACK) {
+                            List<Position> pieceMoveList = piece.getEveryMove();
+
+                            for (Position position : pieceMoveList) {
+                                if (piece.getType() == PieceType.KING && (position.equals(new Position("g", 8))
+                                        || position.equals(new Position("c", 8)))) {
+                                    continue;
+                                }
+
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                    allEnemyMoves.add(position);
+                                }
+                            }
+                        }
+                    }
+
+                    if (isKingInCheck(actualPosition, movePiece, false)) {
+                        return false;
+                    }
+
+                    // nem tud egyik ellenfél bábu oda lépni
+                    for (Position position : allEnemyMoves) {
+                        if (position.equals(new Position("d", 1)) || position.equals(new Position("c", 1)) || position.equals(new Position("b", 1))) {
+                            return false;
+                        }
+                    }
+
+                    // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+                    if (movePiece.hasPieceMoved()) {
+                        return false;
+                    }
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.WHITE && piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("a", 1))) {
+                            if (piece.hasPieceMoved()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+            } else {
+                // rövidsánc
+                if (move.equals(new Position("g", 8))) {
+                    List<Position> allEnemyMoves = new ArrayList<>();
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.WHITE) {
+                            List<Position> pieceMoveList = piece.getEveryMove();
+
+                            for (Position position : pieceMoveList) {
+                                if (piece.getType() == PieceType.KING && (position.equals(new Position("g", 1)) || position.equals(new Position("c", 1)))) {
+                                    continue;
+                                }
+
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                    allEnemyMoves.add(position);
+                                }
+                            }
+                        }
+                    }
+
+                    if (isKingInCheck(actualPosition, movePiece, false)) {
+                        return false;
+                    }
+
+                    // nem tud egyik ellenfél bábu oda lépni
+                    for (Position position : allEnemyMoves) {
+                        if (position.equals(new Position("f", 8)) || position.equals(new Position("g", 8))) {
+                            return false;
+                        }
+                    }
+
+                    // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+                    if (movePiece.hasPieceMoved()) {
+                        return false;
+                    }
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.BLACK && piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("h", 8))) {
+                            if (piece.hasPieceMoved()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                } else if (move.equals(new Position("c", 8))) { // hosszúsánc
+                    List<Position> allEnemyMoves = new ArrayList<>();
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.WHITE) {
+                            List<Position> pieceMoveList = piece.getEveryMove();
+
+                            for (Position position : pieceMoveList) {
+                                if (piece.getType() == PieceType.KING && (position.equals(new Position("g", 1)) || position.equals(new Position("c", 1)))) {
+                                    continue;
+                                }
+
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                    allEnemyMoves.add(position);
+                                }
+                            }
+                        }
+                    }
+
+                    if (isKingInCheck(actualPosition, movePiece, false)) {
+                        return false;
+                    }
+
+                    // nem tud egyik ellenfél bábu oda lépni
+                    for (Position position : allEnemyMoves) {
+                        if (position.equals(new Position("d", 8)) || position.equals(new Position("c", 8))
+                                || position.equals(new Position("b", 8))) {
+                            return false;
+                        }
+                    }
+
+                    // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+                    if (movePiece.hasPieceMoved()) {
+                        return false;
+                    }
+
+                    for (Piece piece : actualPosition) {
+                        if (piece.getColor() == PieceColor.BLACK && piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("a", 8))) {
+                            if (piece.hasPieceMoved()) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+            }
+        }
+
 
         // "lólépés"
         if (movePiece.getType() == PieceType.KNIGHT) {
