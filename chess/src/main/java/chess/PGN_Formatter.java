@@ -161,7 +161,7 @@ public class PGN_Formatter {
     }
 
 
-    public static List<Piece> readFromTextFile(String textFile) throws InvalidPGNFormatException, FileNotFoundException {
+    public static List<Piece> readFromTextFile(String textFile) throws FileNotFoundException {
         File readFile = null;
 
         if (!textFile.contains(".txt")) {
