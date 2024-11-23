@@ -9,6 +9,15 @@ import java.math.*;
 import pieces.*;
 
 public class Rules {
+    
+    /** 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param function
+     * @param checkForChecksAfterMove
+     * @return boolean
+     */
     private static boolean possibleInThatWay(List<Piece> actualPosition, Piece movePiece, Position move, Function<Position, Position> function, boolean checkForChecksAfterMove) {
         Position movePosition = new Position(movePiece.getPosition().getColumn(), movePiece.getPosition().getRow());
         movePosition = function.apply(movePosition);
@@ -41,6 +50,13 @@ public class Rules {
         return true;
     }
 
+    
+    /** 
+     * @param actualPosition
+     * @param position
+     * @param color
+     * @return boolean
+     */
     private static boolean isAPieceThere(List<Piece> actualPosition, Position position, PieceColor color) {
         for (Piece piece : actualPosition) {
             if (piece.getPosition().equals(position) && piece.getColor() != color) {
@@ -51,6 +67,14 @@ public class Rules {
         return false;
     }
 
+    
+    /** 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param king
+     * @return boolean
+     */
     private static boolean isKingInCheckAfterMove(List<Piece> actualPosition, Piece movePiece, Position move, Piece king) {
         List<Piece> actualPositionClone = new ArrayList<>();
 

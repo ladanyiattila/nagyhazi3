@@ -20,6 +20,10 @@ public class Knight extends Piece {
         inStartingPosition = true;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * "L" alakban

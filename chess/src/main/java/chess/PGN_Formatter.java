@@ -28,6 +28,13 @@ public class PGN_Formatter {
 
     private static List<Piece> loadedPosition;
 
+    
+    /** 
+     * @param color
+     * @param type
+     * @param pos
+     * @return Piece
+     */
     private static Piece getPiece(PieceColor color, PieceType type, Position pos) {
         for (Piece piece : loadedPosition) {
             if (piece.getColor() == color && piece.getType() == type && piece.getPosition().equals(pos)) {
@@ -38,6 +45,11 @@ public class PGN_Formatter {
         return null;
     }
 
+    
+    /** 
+     * @param letter
+     * @return PieceType
+     */
     private static PieceType getPieceTypeByLetter(String letter) {
         if (letter.equals(letter.toLowerCase())) {
             return PieceType.PAWN;
@@ -54,6 +66,11 @@ public class PGN_Formatter {
         return map.get(letter);
     }
 
+    
+    /** 
+     * @param type
+     * @return String
+     */
     private static String getLetterByPieceType(PieceType type) {
         if (type == PieceType.PAWN) {
             return "";

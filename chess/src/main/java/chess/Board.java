@@ -93,6 +93,10 @@ public class Board {
     }
 
 
+    
+    /** 
+     * @return List<Piece>
+     */
     public static List<Piece> getStartingPosition() {
         List<Piece> pieces = new ArrayList<>();
 
@@ -131,6 +135,11 @@ public class Board {
     private static List<Position> possibleMoves;
     private static Piece clickedPiece;
 
+    
+    /** 
+     * @param position
+     * @return Piece
+     */
     private static Piece getPieceInActualPosition(Position position) {
         for (Piece piece : actualPosition) {
             if (piece.getPosition().equals(position)) {
@@ -141,6 +150,11 @@ public class Board {
         return null;
     }
 
+    
+    /** 
+     * @param pos
+     * @return boolean
+     */
     private static boolean isInPossibleMove(Position pos) {
         if (possibleMoves == null) {
             return false;

@@ -20,6 +20,10 @@ public class Queen extends Piece {
         inStartingPosition = true;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * függőlegesen, vízszintesen, átlósan annyit, amíg akadályba nem ütközik

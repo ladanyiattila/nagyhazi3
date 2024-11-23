@@ -15,14 +15,26 @@ public abstract class Piece extends Component {
 
     public List<Position> getEveryMove() { return null; }
 
+    
+    /** 
+     * @return Position
+     */
     public Position getPosition() {
         return position;
     }
 
+    
+    /** 
+     * @param p
+     */
     public void setPosition(Position p) {
         position = p;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getImageName() {
         return imageName;
     }

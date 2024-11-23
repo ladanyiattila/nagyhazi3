@@ -20,6 +20,10 @@ public class Bishop extends Piece {
         inStartingPosition = true;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * minden átlón annyit, amíg akadályba nem ütközik

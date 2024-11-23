@@ -20,6 +20,10 @@ public class King extends Piece {
         inStartingPosition = true;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * minden irányba egyet, ha lehetséges

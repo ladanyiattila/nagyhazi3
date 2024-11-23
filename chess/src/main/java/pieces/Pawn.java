@@ -28,6 +28,10 @@ public class Pawn extends Piece {
         movedTwoAtStart = false;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * - 1 lépés előre
@@ -66,6 +70,10 @@ public class Pawn extends Piece {
         return positions;
     }
 
+    
+    /** 
+     * @param g
+     */
     @Override
     public void paint(Graphics g) {
         Toolkit t = Toolkit.getDefaultToolkit();
@@ -81,6 +89,10 @@ public class Pawn extends Piece {
         g.drawImage(t.getImage("chess/src/main/resources/" + filename), 0, 0, null);
     }
 
+    
+    /** 
+     * @return boolean
+     */
     public boolean getMovedTwoAtStart() {
         return movedTwoAtStart;
     }

@@ -23,15 +23,28 @@ public class Position {
         this(letters.indexOf(c) + 1, r);
     }
 
+    
+    /** 
+     * @param r
+     * @param c
+     */
     public void set(int r, int c) {
         row = r;
         column = c;
     }
 
+    
+    /** 
+     * @return String
+     */
     public String columnToString() {
         return letters.get(column - 1);
     }
 
+    
+    /** 
+     * @return boolean
+     */
     public boolean isOutOfBounds() {
         return row > 8 || row < 1 || column > 8 || column < 1;
     }

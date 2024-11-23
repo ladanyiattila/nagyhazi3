@@ -20,6 +20,10 @@ public class Rook extends Piece {
         inStartingPosition = true;
     }
 
+    
+    /** 
+     * @return List<Position>
+     */
     /*
      * Lehetséges lépések:
      * függőlegesen vagy vízszintesen annyit, amíg akadályba nem ütközik
