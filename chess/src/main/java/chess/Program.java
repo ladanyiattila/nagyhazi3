@@ -79,7 +79,7 @@ public class Program {
                 titlePanel.setVisible(false);
                 authorPanel.setVisible(false);
                 bottomPanel.setVisible(false);
-                startGame(null, "", 1);
+                startGame(null, "", 1, null);
             }
         });
 
@@ -117,7 +117,7 @@ public class Program {
         mainFrame.setVisible(true);
     }
 
-    private static void startGame(List<Piece> startingPos, String movesListed, int numberOfMoves) {
+    private static void startGame(List<Piece> startingPos, String movesListed, int numberOfMoves, PieceColor nextMoveColor) {
         mainFrame.setSize(1000, 750);
 
         JTextArea movesText = new JTextArea();
@@ -133,7 +133,7 @@ public class Program {
         movesScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         movesScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        Board board = new Board(startingPos, movesListed, numberOfMoves, movesText);
+        Board board = new Board(startingPos, movesListed, numberOfMoves, movesText, nextMoveColor);
 
         JPanel bottomJPanel = new JPanel();
         bottomJPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 0));
@@ -218,12 +218,15 @@ public class Program {
                     backToMenuPanel.setVisible(false);
 
                     if (list.isEmpty()) {
-                        startGame(null, PGN_Formatter.getMovesListed(textField.getText()), 1);
+                        startGame(null, PGN_Formatter.getMovesListed(textField.getText()), 1, null);
                     } else {
                         System.out.println("lepesszam: " + PGN_Formatter.getNumberOfMoves(textField.getText()));
-                        startGame(list, PGN_Formatter.getMovesListed(textField.getText()), PGN_Formatter.getNumberOfMoves(textField.getText()));
+                        System.out.println("kov szin: " + PGN_Formatter.getNextMoveColor(textField.getText()));
+                        startGame(list, PGN_Formatter.getMovesListed(textField.getText()), PGN_Formatter.getNumberOfMoves(textField.getText()),
+                        PGN_Formatter.getNextMoveColor(textField.getText()));
                     }
                 } catch (Exception exception) {
+                    exception.printStackTrace();
                     errorWhenLoadingGame();
                 }
             }

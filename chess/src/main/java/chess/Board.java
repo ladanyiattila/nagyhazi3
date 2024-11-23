@@ -35,16 +35,18 @@ public class Board {
     private static String movesListed;
     private static int numberOfMoves;
     private static JTextArea movesTextArea;
+    private static JFrame promotionFrame;
 
     static {
-        // fehér kezd
+        // fehér kezd alapértelmezetten
         nextMoveColor = PieceColor.WHITE;
 
         // ne lehessen többször megnyitni az ablakot
         endOfGame = null;
+        promotionFrame = null;
     }
 
-    public Board(List<Piece> startingPos, String movesListed, int numberOfMoves, JTextArea movesTextArea) {
+    public Board(List<Piece> startingPos, String movesListed, int numberOfMoves, JTextArea movesTextArea, PieceColor nextMoveColor) {
         boardPanel = new JPanel();
         boardPanel.setPreferredSize(new Dimension(675, 750));
 
@@ -60,6 +62,10 @@ public class Board {
         this.movesListed = movesListed;
         this.numberOfMoves = numberOfMoves;
         this.movesTextArea = movesTextArea;
+        
+        if (nextMoveColor != null) {
+            this.nextMoveColor = nextMoveColor;
+        }
 
         if (startingPos == null) {
             actualPosition = getStartingPosition();
@@ -199,13 +205,155 @@ public class Board {
             numberOfMoves++;
         }
 
-        System.out.println(movesListed);
         movesTextArea.repaint();
         movesTextArea.setText(movesListed);
     }
 
     public static String getMovesListedVariable() {
         return movesListed;
+    }
+
+    private static void promotionWindow(Position clickedPosition, boolean wasPieceTaken) {
+        if (promotionFrame == null) {
+            promotionFrame = new JFrame();
+        }
+
+        promotionFrame.setSize(400, 200);
+        promotionFrame.setResizable(false);
+        promotionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        promotionFrame.setTitle("Promotion");
+        promotionFrame.setLayout(new BorderLayout());
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        textPanel.setPreferredSize(new Dimension(400, 50));
+
+        JLabel label = new JLabel("Choose a piece: ");
+        label.setFont(new Font("Arial", 0, 20));
+        textPanel.add(label);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        buttonPanel.setPreferredSize(new Dimension(400, 100));
+
+        JButton queenButton = new JButton();
+        if (clickedPiece.getColor() == PieceColor.BLACK) {
+            queenButton.setIcon(new ImageIcon("piece_images/black_queen.png"));
+        } else {
+            queenButton.setIcon(new ImageIcon("piece_images/white_queen.png"));
+        }
+        queenButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actualPosition.add(new Queen(clickedPiece.getColor(), clickedPosition));
+
+                movesListed += (nextMoveColor == PieceColor.BLACK ? numberOfMoves + "." : "") + PGN_Formatter.getMoveFormatted(clickedPiece, clickedPosition, wasPieceTaken, actualPosition) + "=Q" 
+                + (nextMoveColor == PieceColor.BLACK ? " " : "\n");
+
+                if (nextMoveColor == PieceColor.WHITE) {
+                    numberOfMoves++;
+                }
+
+                movesTextArea.repaint();
+                movesTextArea.setText(movesListed);
+
+                promotionFrame.setVisible(false);
+                boardTable.repaint();
+            }
+        });
+        queenButton.setPreferredSize(new Dimension(80, 80));
+        buttonPanel.add(queenButton);
+
+
+        JButton rookButton = new JButton();
+        if (clickedPiece.getColor() == PieceColor.BLACK) {
+            rookButton.setIcon(new ImageIcon("piece_images/black_rook.png"));
+        } else {
+            rookButton.setIcon(new ImageIcon("piece_images/white_rook.png"));
+        }
+        rookButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actualPosition.add(new Rook(clickedPiece.getColor(), clickedPosition));
+
+                movesListed += (nextMoveColor == PieceColor.BLACK ? numberOfMoves + "." : "")
+                        + PGN_Formatter.getMoveFormatted(clickedPiece, clickedPosition, wasPieceTaken, actualPosition)
+                        + "=R"
+                        + (nextMoveColor == PieceColor.BLACK ? " " : "\n");
+
+                if (nextMoveColor == PieceColor.WHITE) {
+                    numberOfMoves++;
+                }
+
+                movesTextArea.repaint();
+                movesTextArea.setText(movesListed);
+
+                promotionFrame.setVisible(false);
+                boardTable.repaint();
+            }
+        });
+        rookButton.setPreferredSize(new Dimension(80, 80));
+        buttonPanel.add(rookButton);
+
+        JButton knightButton = new JButton();
+        if (clickedPiece.getColor() == PieceColor.BLACK) {
+            knightButton.setIcon(new ImageIcon("piece_images/black_knight.png"));
+        } else {
+            knightButton.setIcon(new ImageIcon("piece_images/white_knight.png"));
+        }
+        knightButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actualPosition.add(new Knight(clickedPiece.getColor(), clickedPosition));
+
+                movesListed += (nextMoveColor == PieceColor.BLACK ? numberOfMoves + "." : "")
+                        + PGN_Formatter.getMoveFormatted(clickedPiece, clickedPosition, wasPieceTaken, actualPosition)
+                        + "=N"
+                        + (nextMoveColor == PieceColor.BLACK ? " " : "\n");
+
+                if (nextMoveColor == PieceColor.WHITE) {
+                    numberOfMoves++;
+                }
+
+                movesTextArea.repaint();
+                movesTextArea.setText(movesListed);
+
+                promotionFrame.setVisible(false);
+                boardTable.repaint();
+            }
+        });
+        knightButton.setPreferredSize(new Dimension(80, 80));
+        buttonPanel.add(knightButton);
+
+        JButton bishopButton = new JButton();
+        if (clickedPiece.getColor() == PieceColor.BLACK) {
+            bishopButton.setIcon(new ImageIcon("piece_images/black_bishop.png"));
+        } else {
+            bishopButton.setIcon(new ImageIcon("piece_images/white_bishop.png"));
+        }
+        bishopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                actualPosition.add(new Bishop(clickedPiece.getColor(), clickedPosition));
+
+                movesListed += (nextMoveColor == PieceColor.BLACK ? numberOfMoves + "." : "")
+                        + PGN_Formatter.getMoveFormatted(clickedPiece, clickedPosition, wasPieceTaken, actualPosition)
+                        + "=B"
+                        + (nextMoveColor == PieceColor.BLACK ? " " : "\n");
+
+                if (nextMoveColor == PieceColor.WHITE) {
+                    numberOfMoves++;
+                }
+
+                movesTextArea.repaint();
+                movesTextArea.setText(movesListed);
+
+                promotionFrame.setVisible(false);
+                boardTable.repaint();
+            }
+        });
+        bishopButton.setPreferredSize(new Dimension(80, 80));
+        buttonPanel.add(bishopButton);
+
+        promotionFrame.add(textPanel, BorderLayout.NORTH);
+        promotionFrame.add(buttonPanel, BorderLayout.SOUTH);
+        promotionFrame.setVisible(true);
     }
 
     class ClickedOnTable extends MouseAdapter {
@@ -249,7 +397,33 @@ public class Board {
 
                     Position movedTo = new Position(clickedPosition.getColumn(), clickedPosition.getRow());
 
-                    addMove(PGN_Formatter.getMoveFormatted(clickedPiece, movedTo, wasPieceTaken, actualPosition));
+                    boolean wasTherePromotion = false;
+
+                    // átalakulás
+                    if (clickedPiece.getType() == PieceType.PAWN
+                            && (clickedPosition.getRow() == 1 || clickedPosition.getRow() == 8)) {
+                        ListIterator<Piece> iterator = actualPosition.listIterator();
+
+
+                        while (iterator.hasNext()) {
+                            Piece current = iterator.next();
+
+                            if (current.getPosition().equals(clickedPiece.getPosition())) {
+                                iterator.remove();
+                                break;
+                            }
+                        }
+
+                        System.out.println("promotion");
+                        System.out.println(clickedPiece.getPosition());
+                        Board.promotionWindow(clickedPosition, wasPieceTaken);
+                        boardTable.repaint();
+                        wasTherePromotion = true;
+                    }
+                
+                    if (!wasTherePromotion) {
+                        addMove(PGN_Formatter.getMoveFormatted(clickedPiece, movedTo, wasPieceTaken, actualPosition));
+                    }
 
                     for (Piece piece : actualPosition) {
                         if (clickedPiece.equals(piece)) {
@@ -263,8 +437,10 @@ public class Board {
                         nextMoveColor = PieceColor.WHITE;
                     }
 
-                    clickedPiece.setPosition(clickedPosition);
-                    clickedPiece.pieceHasMoved();
+                    if (!wasTherePromotion) {
+                        clickedPiece.setPosition(clickedPosition);
+                        clickedPiece.pieceHasMoved();
+                    }
 
                     // sáncolás
                     if (clickedPiece.getType() == PieceType.KING) {
@@ -313,6 +489,8 @@ public class Board {
                             }
                         }
                     }
+
+                    
 
                     possibleMoves = null;
                 } else {

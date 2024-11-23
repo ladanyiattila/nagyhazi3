@@ -132,6 +132,8 @@ public class PGN_Formatter {
 
         String[] moves = scanner.nextLine().split(" ");
 
+        scanner.close();
+
         int i = 1;
 
         for (String move : moves) {
@@ -167,6 +169,8 @@ public class PGN_Formatter {
 
         String[] moves = scanner.nextLine().split(" ");
 
+        scanner.close();
+
         for (String move : moves) {
             PieceColor nextColor = PieceColor.BLACK;
             String actualMove = move;
@@ -179,6 +183,106 @@ public class PGN_Formatter {
 
             if (actualMove.contains("+")) {
                 actualMove = actualMove.split("\\+")[0];
+            }
+
+            // átalakulás
+            if (actualMove.contains("=")) {
+                // gyalog törlése az eggyel előtti sorból
+
+                String[] splitMove = actualMove.split("\\=");
+                actualMove = splitMove[0];
+                String typeString = splitMove[1];
+
+                // axb8=Q pl.
+                if (actualMove.contains("x")) {
+                    String pawnColumn = Character.toString(actualMove.charAt(0));
+
+                    String column = Character.toString(actualMove.charAt(2));
+                    int row = Character.getNumericValue(actualMove.charAt(3));
+
+                    // ütött bábu törlése
+                    ListIterator<Piece> iterator = loadedPosition.listIterator();
+
+                    while (iterator.hasNext()) {
+                        Piece current = iterator.next();
+
+                        if (current.getPosition().equals(new Position(column, row))) {
+                            iterator.remove();
+                        }
+                    }
+
+                    // gyalog törlése
+                    iterator = loadedPosition.listIterator();
+                    Position pawnPos = new Position(pawnColumn, nextColor == PieceColor.WHITE ? row - 1 : row + 1);
+
+                    while (iterator.hasNext()) {
+                        Piece current = iterator.next();
+
+                        if (current.getPosition().equals(pawnPos) && current.getType() == PieceType.PAWN) {
+                            iterator.remove();
+                        }
+                    }
+
+                    switch (getPieceTypeByLetter(typeString)) {
+                        case QUEEN:
+                            loadedPosition.add(new Queen(nextColor, new Position(column, row)));
+                            break;
+                        
+                        case ROOK:
+                            loadedPosition.add(new Rook(nextColor, new Position(column, row)));
+                            break;
+
+                        case KNIGHT:
+                            loadedPosition.add(new Knight(nextColor, new Position(column, row)));
+                            break;
+
+                        case BISHOP:
+                            loadedPosition.add(new Bishop(nextColor, new Position(column, row)));
+                            break;
+
+                        default:
+                            break;
+                    }
+                } else {
+                    String column = Character.toString(actualMove.charAt(0));
+                    int row = Character.getNumericValue(actualMove.charAt(1));
+
+                    // gyalog törlése
+                    ListIterator<Piece> iterator = loadedPosition.listIterator();
+                    Position pawnPos = new Position(column, nextColor == PieceColor.WHITE ? row - 1 : row + 1);
+
+
+                    while (iterator.hasNext()) {
+                        Piece current = iterator.next();
+
+                        if (current.getPosition().equals(pawnPos) && current.getType() == PieceType.PAWN) {
+                            iterator.remove();
+                        }
+                    }
+
+                    switch (getPieceTypeByLetter(typeString)) {
+                        case QUEEN:
+                            loadedPosition.add(new Queen(nextColor, new Position(column, row)));
+                            break;
+                        
+                        case ROOK:
+                            loadedPosition.add(new Rook(nextColor, new Position(column, row)));
+                            break;
+
+                        case KNIGHT:
+                            loadedPosition.add(new Knight(nextColor, new Position(column, row)));
+                            break;
+
+                        case BISHOP:
+                            loadedPosition.add(new Bishop(nextColor, new Position(column, row)));
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                continue;
             }
 
             // sáncolás
@@ -449,7 +553,6 @@ public class PGN_Formatter {
         Scanner scanner = new Scanner(readFile);
 
         String line = scanner.nextLine();
-        System.out.println(line);
         int numberOfNewLine = 0;
 
         for (char c : line.toCharArray()) {
@@ -462,5 +565,27 @@ public class PGN_Formatter {
 
         return numberOfNewLine + 1;
     }
+
+    public static PieceColor getNextMoveColor(String textFile) throws FileNotFoundException {
+        File readFile = null;
+
+        if (!textFile.contains(".txt")) {
+            readFile = new File("saved_games/" + textFile + ".txt");
+        } else {
+            readFile = new File("saved_games/" + textFile);
+        }
+
+        Scanner scanner = new Scanner(readFile);
+        String[] moves = scanner.nextLine().split(" ");
+
+        scanner.close();
+
+        if (moves[moves.length - 1].contains(".")) {
+            return PieceColor.BLACK;
+        }
+
+        return PieceColor.WHITE;
+    }
+
 
 }
