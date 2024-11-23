@@ -11,6 +11,8 @@ import java.util.List;
 import pieces.*;
 
 public class Pawn extends Piece {
+    private boolean movedTwoAtStart;
+
     public Pawn(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -23,6 +25,7 @@ public class Pawn extends Piece {
 
         type = PieceType.PAWN;
         inStartingPosition = true;
+        movedTwoAtStart = false;
     }
 
     /*
@@ -76,5 +79,13 @@ public class Pawn extends Piece {
         }
 
         g.drawImage(t.getImage("chess/src/main/resources/" + filename), 0, 0, null);
+    }
+
+    public boolean getMovedTwoAtStart() {
+        return movedTwoAtStart;
+    }
+
+    public void setTwoMove() {
+        movedTwoAtStart = true;
     }
 }
