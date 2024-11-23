@@ -113,7 +113,7 @@ public class Rules {
                         continue;
                     }
                         
-                    if (!isMovePossible(actualPosition, piece, current, piece.getColor(), false, false)) {
+                    if (!isMovePossible(actualPosition, piece, current, piece.getColor(), false, false, null, null)) {
                         iter.remove();
                     }
                 }
@@ -129,7 +129,7 @@ public class Rules {
         return false;
     }
 
-    public static boolean isMovePossible(List<Piece> actualPosition, Piece movePiece, Position move, PieceColor nextMoveColor, boolean checkForChecks, boolean checkForChecksAfterMove) {
+    public static boolean isMovePossible(List<Piece> actualPosition, Piece movePiece, Position move, PieceColor nextMoveColor, boolean checkForChecks, boolean checkForChecksAfterMove, Piece lastMovePiece, Position lastMovePosition) {
         // ugyanolyan színű bábut ne lehessen "ütni"
         for (Piece piece : actualPosition) {
             if (piece.getPosition().equals(move) && movePiece.getColor() == piece.getColor()) {
@@ -146,7 +146,7 @@ public class Rules {
             }
 
             if (isKingInCheck(actualPosition, king, false)) {
-                if (isMovePossible(actualPosition, movePiece, move, nextMoveColor, false, false)) {
+                if (isMovePossible(actualPosition, movePiece, move, nextMoveColor, false, false, lastMovePiece, lastMovePosition)) {
                     return !isKingInCheckAfterMove(actualPosition, movePiece, move, king);
                 }
             }
@@ -161,7 +161,7 @@ public class Rules {
                 if (piece.getColor() != movePiece.getColor()) {
                     for (Position pos : piece.getEveryMove()) {
                         if (piece.getType() != PieceType.KING && !(piece.getType() == PieceType.PAWN
-                                && pos.getColumn() == piece.getPosition().getColumn()) && isMovePossible(actualPosition, piece, pos, piece.getColor(), false, true)) {
+                                && pos.getColumn() == piece.getPosition().getColumn()) && isMovePossible(actualPosition, piece, pos, piece.getColor(), false, true, lastMovePiece, lastMovePosition)) {
                             opponentEveryMove.add(pos);
                         }
                     }
@@ -210,7 +210,7 @@ public class Rules {
                                     continue;
                                 }
 
-                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false, lastMovePiece, lastMovePosition)) {
                                     allEnemyMoves.add(position);
                                 }
                             }
@@ -255,7 +255,7 @@ public class Rules {
                                     continue;
                                 }
 
-                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false, lastMovePiece, lastMovePosition)) {
                                     allEnemyMoves.add(position);
                                 }
                             }
@@ -302,7 +302,7 @@ public class Rules {
                                     continue;
                                 }
 
-                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false, lastMovePiece, lastMovePosition)) {
                                     allEnemyMoves.add(position);
                                 }
                             }
@@ -346,7 +346,7 @@ public class Rules {
                                     continue;
                                 }
 
-                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false)) {
+                                if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false, lastMovePiece, lastMovePosition)) {
                                     allEnemyMoves.add(position);
                                 }
                             }
@@ -395,17 +395,36 @@ public class Rules {
 
             return !(checkForChecksAfterMove && isKingInCheckAfterMove(actualPosition, movePiece, move, king));
         }
-
-        // TODO: en passant
-
+        
         // gyalog ütés
         if (movePiece.getType() == PieceType.PAWN) {
             Position diagonalPos = movePiece.getPosition().rightDiagonal(movePiece.getColor(), Direction.FORWARD);
+            if (lastMovePiece != null && lastMovePiece.getType() == PieceType.PAWN && lastMovePosition.getRow() == movePiece
+                    .getPosition().getRow() && ((Pawn) lastMovePiece).getMovedTwoAtStart()
+            && lastMovePosition.getColumn() - movePiece.getPosition().getColumn() == 1 * (movePiece.getColor() == PieceColor.WHITE ? 1 : -1)) {
+                return true;
+            }
+
             if (diagonalPos != null && diagonalPos.equals(move)) {
                 return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());
             }
 
             diagonalPos = movePiece.getPosition().leftDiagonal(movePiece.getColor(), Direction.FORWARD);
+
+            if (lastMovePiece != null
+                    && lastMovePiece.getType() == PieceType.PAWN && lastMovePosition.getRow() == movePiece.getPosition().getRow()
+                    && ((Pawn) lastMovePiece).getMovedTwoAtStart()
+                    && lastMovePosition.getColumn() - movePiece.getPosition().getColumn() == -1 
+                            * (movePiece.getColor() == PieceColor.WHITE ? 1 : -1)) {
+                return true;
+            }
+
+            if (lastMovePiece != null) {
+                System.out.println(lastMovePiece + " " + lastMovePosition);
+                System.out.println(lastMovePiece.getType() == PieceType.PAWN && lastMovePosition.getRow() == movePiece.getPosition().getRow() && Math.abs(lastMovePosition.getColumn() - movePiece.getPosition().getColumn()) == 1);
+                System.out.println(lastMovePosition.getColumn() - movePiece.getPosition().getColumn());
+            }
+
             if (diagonalPos != null && diagonalPos.equals(move)) {
                 return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());
             }
@@ -503,7 +522,7 @@ public class Rules {
         for (Piece piece : actualPosition) {
             if (piece.getColor() == color) {
                 for (Position pos : piece.getEveryMove()) {
-                    if (isMovePossible(actualPosition, piece, pos, color, true, true)) {
+                    if (isMovePossible(actualPosition, piece, pos, color, true, true, null, null)) {
                         everyMove.add(pos);
                     }
                 }

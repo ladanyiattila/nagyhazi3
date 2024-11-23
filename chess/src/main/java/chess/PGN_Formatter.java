@@ -88,7 +88,7 @@ public class PGN_Formatter {
         List<Position> positions = new ArrayList<>();
 
         for (Position pos : piece.getEveryMove()) {
-            if (Rules.isMovePossible(loadedPosition, piece, pos, piece.getColor(), true, true)) {
+            if (Rules.isMovePossible(loadedPosition, piece, pos, piece.getColor(), true, true, null, null)) {
                 positions.add(pos);
             }
         }
@@ -147,6 +147,17 @@ public class PGN_Formatter {
         }
 
         return ret;
+    }
+
+    private static boolean isThereAPiece(Position pos) {
+        for (Piece piece : loadedPosition) {
+            if (piece.getPosition().equals(pos)) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
 
@@ -334,7 +345,11 @@ public class PGN_Formatter {
                     Piece movePiece = getPiece(nextColor, movePieceType,
                             new Position(Character.toString(actualMove.charAt(0)), nextColor == PieceColor.WHITE ? row - 1 : row + 1));
 
-                    deletePiece(new Position(column, row));
+                    if (isThereAPiece(new Position(column, row))) {
+                        deletePiece(new Position(column, row));
+                    } else {
+                        deletePiece(new Position(column, row + (nextColor == PieceColor.WHITE ? -1 : 1)));
+                    }
 
                     movePiece.setPosition(new Position(column, row));
                     movePiece.pieceHasMoved();
@@ -463,7 +478,7 @@ public class PGN_Formatter {
         while (iter.hasNext()) {
             Position current = iter.next(); 
 
-            if (!Rules.isMovePossible(actualPosition, piece, current, piece.getColor(), true, true)) {
+            if (!Rules.isMovePossible(actualPosition, piece, current, piece.getColor(), true, true, null, null)) {
                 iter.remove();
             }
         }

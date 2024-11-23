@@ -36,6 +36,8 @@ public class Board {
     private static int numberOfMoves;
     private static JTextArea movesTextArea;
     private static JFrame promotionFrame;
+    private static Piece lastMovePiece;
+    private static Position lastMovePosition;
 
     static {
         // fehér kezd alapértelmezetten
@@ -375,7 +377,7 @@ public class Board {
                     while (iter.hasNext()) {
                         Position current = iter.next();
                         
-                        if (!Rules.isMovePossible(actualPosition, pieceThere, current, nextMoveColor, true, true)) {
+                        if (!Rules.isMovePossible(actualPosition, pieceThere, current, nextMoveColor, true, true, lastMovePiece, lastMovePosition)) {
                             iter.remove();
                         }
                     }
@@ -421,9 +423,35 @@ public class Board {
                         wasTherePromotion = true;
                     }
                 
-                    if (!wasTherePromotion) {
+                    // en passant esetén a gyalog törlése
+                    if (clickedPiece.getType() == PieceType.PAWN && getPieceInActualPosition(clickedPosition) == null
+                        && (clickedPosition.getRow() == 3 || clickedPosition.getRow() == 6) && clickedPiece.getPosition().getColumn() != clickedPosition.getColumn()) {
+                        
+                        ListIterator<Piece> iterator = actualPosition.listIterator();
+
+                        Position pawnPos = new Position(clickedPosition.getColumn(), clickedPosition.getRow() + (clickedPiece.getColor() == PieceColor.WHITE ? -1 : 1));
+
+                        System.out.println("pawn: " + pawnPos);
+
+                        while (iterator.hasNext()) {
+                            Piece current = iterator.next();
+
+                            if (current.getPosition().equals(pawnPos)) {
+                                iterator.remove();
+                            }
+                        }
+
+                        addMove(clickedPiece.getPosition().columnToString() + "x" + clickedPosition.columnToString() + clickedPosition.getRow());
+
+                    } else if (!wasTherePromotion) {
                         addMove(PGN_Formatter.getMoveFormatted(clickedPiece, movedTo, wasPieceTaken, actualPosition));
                     }
+
+                    if (clickedPiece.getType() == PieceType.PAWN && Math.abs(clickedPiece.getPosition().getRow() - clickedPosition.getRow()) == 2) {
+                        ((Pawn) clickedPiece).setTwoMove();
+                    }
+
+                    
 
                     for (Piece piece : actualPosition) {
                         if (clickedPiece.equals(piece)) {
@@ -439,6 +467,8 @@ public class Board {
 
                     if (!wasTherePromotion) {
                         clickedPiece.setPosition(clickedPosition);
+                        lastMovePiece = clickedPiece;
+                        lastMovePosition = clickedPosition;
                         clickedPiece.pieceHasMoved();
                     }
 
@@ -451,6 +481,7 @@ public class Board {
                                     if (piece.getType() == PieceType.ROOK && piece.getPosition().equals(new Position("h", 1))) {
                                         piece.setPosition(new Position("f", 1));
                                         piece.pieceHasMoved();
+                                        lastMovePiece = clickedPiece;
                                     }
                                 }
                             }
@@ -462,6 +493,7 @@ public class Board {
                                             && piece.getPosition().equals(new Position("a", 1))) {
                                         piece.setPosition(new Position("d", 1));
                                         piece.pieceHasMoved();
+                                        lastMovePiece = clickedPiece;
                                     }
                                 }
                             }   
@@ -473,6 +505,7 @@ public class Board {
                                             && piece.getPosition().equals(new Position("h", 8))) {
                                         piece.setPosition(new Position("f", 8));
                                         piece.pieceHasMoved();
+                                        lastMovePiece = clickedPiece;
                                     }
                                 }
                             }
@@ -484,6 +517,7 @@ public class Board {
                                             && piece.getPosition().equals(new Position("a", 8))) {
                                         piece.setPosition(new Position("d", 8));
                                         piece.pieceHasMoved();
+                                        lastMovePiece = clickedPiece;
                                     }
                                 }
                             }
