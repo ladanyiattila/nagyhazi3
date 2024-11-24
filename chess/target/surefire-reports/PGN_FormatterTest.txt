@@ -1,11 +1,12 @@
 -------------------------------------------------------------------------------
 Test set: PGN_FormatterTest
 -------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 s - in PGN_FormatterTest
-PGN_FormatterTest.getMovesListedTestLong  Time elapsed: 0.063 s
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.176 s - in PGN_FormatterTest
+PGN_FormatterTest.getMovesListedTestLong  Time elapsed: 0.038 s
 PGN_FormatterTest.getNumberOfMovesTestLong  Time elapsed: 0.003 s
-PGN_FormatterTest.getMovesListedTest  Time elapsed: 0.002 s
-PGN_FormatterTest.getMoveFormattedTest  Time elapsed: 0.048 s
-PGN_FormatterTest.readFromTextFileTest  Time elapsed: 0.007 s
+PGN_FormatterTest.readFromTextFilePromotionTest  Time elapsed: 0.003 s
+PGN_FormatterTest.getMovesListedTest  Time elapsed: 0.003 s
+PGN_FormatterTest.getMoveFormattedTest  Time elapsed: 0.106 s
+PGN_FormatterTest.readFromTextFileTest  Time elapsed: 0.004 s
 PGN_FormatterTest.getNumberOfMovesTest  Time elapsed: 0.001 s
 PGN_FormatterTest.getNextMoveColorTest  Time elapsed: 0.002 s

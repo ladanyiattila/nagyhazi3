@@ -81,13 +81,13 @@ public class King extends Piece {
         }
 
         // sáncolás (a király még nem mozdult meg az alap pozícióból)
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (this.inStartingPosition) {</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (this.inStartingPosition) {</span>
 <span class="pc bpc" id="L85" title="1 of 4 branches missed.">            if (this.color == PieceColor.WHITE &amp;&amp; this.getPosition().equals(new Position(&quot;e&quot;, 1))) {</span>
 <span class="fc" id="L86">                positions.add(new Position(&quot;g&quot;, 1));</span>
 <span class="fc" id="L87">                positions.add(new Position(&quot;c&quot;, 1));</span>
-<span class="pc bpc" id="L88" title="2 of 4 branches missed.">            } else if (this.color == PieceColor.BLACK &amp;&amp; this.getPosition().equals(new Position(&quot;e&quot;, 8))) {</span>
-<span class="nc" id="L89">                positions.add(new Position(&quot;g&quot;, 8));</span>
-<span class="nc" id="L90">                positions.add(new Position(&quot;c&quot;, 8));</span>
+<span class="pc bpc" id="L88" title="1 of 4 branches missed.">            } else if (this.color == PieceColor.BLACK &amp;&amp; this.getPosition().equals(new Position(&quot;e&quot;, 8))) {</span>
+<span class="fc" id="L89">                positions.add(new Position(&quot;g&quot;, 8));</span>
+<span class="fc" id="L90">                positions.add(new Position(&quot;c&quot;, 8));</span>
             }   
         }
 

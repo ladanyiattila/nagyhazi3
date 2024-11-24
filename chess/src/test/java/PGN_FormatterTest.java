@@ -1,7 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +14,7 @@ import pieces.Pawn;
 import pieces.Piece;
 import pieces.PieceColor;
 import pieces.Position;
+import pieces.Queen;
 import pieces.Rook;
 
 public class PGN_FormatterTest {
@@ -144,6 +144,52 @@ public class PGN_FormatterTest {
 
         assertTrue(areTwoPositionsEqual(expected, loaded));
     }
+
+    @Test
+    void readFromTextFilePromotionTest() {
+        List<Piece> loaded = null;
+
+        try {
+            loaded = PGN_Formatter.readFromTextFile("test5");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        List<Piece> expected = new ArrayList<>(List.of(
+            new Pawn(PieceColor.BLACK, new Position("b", 7)),
+            new Pawn(PieceColor.BLACK, new Position("c", 7)),
+            new Pawn(PieceColor.BLACK, new Position("d", 7)),
+            new Pawn(PieceColor.BLACK, new Position("e", 7)),
+            new Pawn(PieceColor.BLACK, new Position("f", 7)),
+            new Pawn(PieceColor.BLACK, new Position("g", 7)),
+            new Bishop(PieceColor.BLACK, new Position("c", 8)),
+            new Bishop(PieceColor.BLACK, new Position("f", 8)),
+            new Knight(PieceColor.BLACK, new Position("g", 8)),
+            new Rook(PieceColor.BLACK, new Position("h", 7)),
+            new Queen(PieceColor.BLACK, new Position("d", 8)),
+            new King(PieceColor.BLACK, new Position("d", 8)),
+
+            new Pawn(PieceColor.WHITE, new Position("b", 2)),
+            new Pawn(PieceColor.WHITE, new Position("c", 2)),
+            new Pawn(PieceColor.WHITE, new Position("d", 4)),
+            new Pawn(PieceColor.WHITE, new Position("e", 2)),
+            new Pawn(PieceColor.WHITE, new Position("f", 2)),
+            new Pawn(PieceColor.WHITE, new Position("g", 2)),
+            new Pawn(PieceColor.WHITE, new Position("h", 2)),
+            new Rook(PieceColor.WHITE, new Position("a", 1)),
+            new Rook(PieceColor.WHITE, new Position("h", 1)),
+            new Knight(PieceColor.WHITE, new Position("b", 1)),
+            new Knight(PieceColor.WHITE, new Position("g", 1)),
+            new Bishop(PieceColor.WHITE, new Position("c", 1)),
+            new Bishop(PieceColor.WHITE, new Position("f", 1)),
+            new King(PieceColor.WHITE, new Position("e", 1)),
+
+            new Rook(PieceColor.WHITE, new Position("b", 8))
+        ));
+
+        assertTrue(areTwoPositionsEqual(expected, loaded));
+    }
     
     private static boolean areTwoPositionsEqual(List<Piece> first, List<Piece> second) {
         if (first.size() != second.size()) {
@@ -171,7 +217,4 @@ public class PGN_FormatterTest {
 
         return null;
     }
-
-
-
 }

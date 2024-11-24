@@ -247,14 +247,14 @@ public class PGN_Formatter {
      * @param row
      */
     private static void addOfficer(String typeString, PieceColor nextColor, String column, int row) {
-<span class="nc bnc" id="L250" title="All 5 branches missed.">        switch (getPieceTypeByLetter(typeString)) {</span>
+<span class="pc bpc" id="L250" title="4 of 5 branches missed.">        switch (getPieceTypeByLetter(typeString)) {</span>
             case QUEEN:
 <span class="nc" id="L252">                loadedPosition.add(new Queen(nextColor, new Position(column, row)));</span>
 <span class="nc" id="L253">                break;</span>
 
             case ROOK:
-<span class="nc" id="L256">                loadedPosition.add(new Rook(nextColor, new Position(column, row)));</span>
-<span class="nc" id="L257">                break;</span>
+<span class="fc" id="L256">                loadedPosition.add(new Rook(nextColor, new Position(column, row)));</span>
+<span class="fc" id="L257">                break;</span>
 
             case KNIGHT:
 <span class="nc" id="L260">                loadedPosition.add(new Knight(nextColor, new Position(column, row)));</span>
@@ -267,7 +267,7 @@ public class PGN_Formatter {
             default:
                 break;
         }
-<span class="nc" id="L270">    }</span>
+<span class="fc" id="L270">    }</span>
 
     /**
      * Átalakulás lépés beolvasása esetén módosítja a betöltött állást a
@@ -279,42 +279,42 @@ public class PGN_Formatter {
     private static void promotion(String actualMove, PieceColor nextColor) {
         // gyalog törlése az eggyel előtti sorból
 
-<span class="nc" id="L282">        String[] splitMove = actualMove.split(&quot;\\=&quot;);</span>
-<span class="nc" id="L283">        actualMove = splitMove[0];</span>
-<span class="nc" id="L284">        String typeString = splitMove[1];</span>
+<span class="fc" id="L282">        String[] splitMove = actualMove.split(&quot;\\=&quot;);</span>
+<span class="fc" id="L283">        actualMove = splitMove[0];</span>
+<span class="fc" id="L284">        String typeString = splitMove[1];</span>
 
         // axb8=Q pl.
-<span class="nc bnc" id="L287" title="All 2 branches missed.">        if (actualMove.contains(&quot;x&quot;)) {</span>
-<span class="nc" id="L288">            String pawnColumn = Character.toString(actualMove.charAt(0));</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">        if (actualMove.contains(&quot;x&quot;)) {</span>
+<span class="fc" id="L288">            String pawnColumn = Character.toString(actualMove.charAt(0));</span>
 
-<span class="nc" id="L290">            String column = Character.toString(actualMove.charAt(2));</span>
-<span class="nc" id="L291">            int row = Character.getNumericValue(actualMove.charAt(3));</span>
+<span class="fc" id="L290">            String column = Character.toString(actualMove.charAt(2));</span>
+<span class="fc" id="L291">            int row = Character.getNumericValue(actualMove.charAt(3));</span>
 
             // ütött bábu törlése
-<span class="nc" id="L294">            ListIterator&lt;Piece&gt; iterator = loadedPosition.listIterator();</span>
+<span class="fc" id="L294">            ListIterator&lt;Piece&gt; iterator = loadedPosition.listIterator();</span>
 
-<span class="nc bnc" id="L296" title="All 2 branches missed.">            while (iterator.hasNext()) {</span>
-<span class="nc" id="L297">                Piece current = iterator.next();</span>
+<span class="fc bfc" id="L296" title="All 2 branches covered.">            while (iterator.hasNext()) {</span>
+<span class="fc" id="L297">                Piece current = iterator.next();</span>
 
-<span class="nc bnc" id="L299" title="All 2 branches missed.">                if (current.getPosition().equals(new Position(column, row))) {</span>
-<span class="nc" id="L300">                    iterator.remove();</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">                if (current.getPosition().equals(new Position(column, row))) {</span>
+<span class="fc" id="L300">                    iterator.remove();</span>
                 }
             }
 
             // gyalog törlése
-<span class="nc" id="L305">            iterator = loadedPosition.listIterator();</span>
-<span class="nc bnc" id="L306" title="All 2 branches missed.">            Position pawnPos = new Position(pawnColumn, nextColor == PieceColor.WHITE ? row - 1 : row + 1);</span>
+<span class="fc" id="L305">            iterator = loadedPosition.listIterator();</span>
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">            Position pawnPos = new Position(pawnColumn, nextColor == PieceColor.WHITE ? row - 1 : row + 1);</span>
 
-<span class="nc bnc" id="L308" title="All 2 branches missed.">            while (iterator.hasNext()) {</span>
-<span class="nc" id="L309">                Piece current = iterator.next();</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">            while (iterator.hasNext()) {</span>
+<span class="fc" id="L309">                Piece current = iterator.next();</span>
 
-<span class="nc bnc" id="L311" title="All 4 branches missed.">                if (current.getPosition().equals(pawnPos) &amp;&amp; current.getType() == PieceType.PAWN) {</span>
-<span class="nc" id="L312">                    iterator.remove();</span>
+<span class="pc bpc" id="L311" title="1 of 4 branches missed.">                if (current.getPosition().equals(pawnPos) &amp;&amp; current.getType() == PieceType.PAWN) {</span>
+<span class="fc" id="L312">                    iterator.remove();</span>
                 }
             }
 
-<span class="nc" id="L316">            addOfficer(typeString, nextColor, column, row);</span>
-<span class="nc" id="L317">        } else {</span>
+<span class="fc" id="L316">            addOfficer(typeString, nextColor, column, row);</span>
+<span class="fc" id="L317">        } else {</span>
 <span class="nc" id="L318">            String column = Character.toString(actualMove.charAt(0));</span>
 <span class="nc" id="L319">            int row = Character.getNumericValue(actualMove.charAt(1));</span>
 
@@ -332,7 +332,7 @@ public class PGN_Formatter {
 
 <span class="nc" id="L333">            addOfficer(typeString, nextColor, column, row);</span>
         }
-<span class="nc" id="L335">    }</span>
+<span class="fc" id="L335">    }</span>
 
     /**
      * Megvalósítja a rövidsáncolás lépését.
@@ -571,9 +571,9 @@ public class PGN_Formatter {
             }
 
             // átalakulás
-<span class="pc bpc" id="L574" title="1 of 2 branches missed.">            if (actualMove.contains(&quot;=&quot;)) {</span>
-<span class="nc" id="L575">                promotion(actualMove, nextColor);</span>
-<span class="nc" id="L576">                continue;</span>
+<span class="fc bfc" id="L574" title="All 2 branches covered.">            if (actualMove.contains(&quot;=&quot;)) {</span>
+<span class="fc" id="L575">                promotion(actualMove, nextColor);</span>
+<span class="fc" id="L576">                continue;</span>
             }
 
             // rövidsánc

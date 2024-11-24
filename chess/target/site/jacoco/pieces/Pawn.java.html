@@ -54,7 +54,7 @@ public class Pawn extends Piece {
 
         // kezdő sorból 2 lépés is lehetséges
 <span class="fc bfc" id="L56" title="All 4 branches covered.">        if ((color == PieceColor.WHITE &amp;&amp; position.getRow() == 2) </span>
-<span class="pc bpc" id="L57" title="1 of 4 branches missed.">        || (color == PieceColor.BLACK &amp;&amp; position.getRow() == 7)) {</span>
+<span class="fc bfc" id="L57" title="All 4 branches covered.">        || (color == PieceColor.BLACK &amp;&amp; position.getRow() == 7)) {</span>
 <span class="fc" id="L58">            positions.add(position.forward(color).forward(color));</span>
         }
 
