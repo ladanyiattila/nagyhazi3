@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PGN_Formatter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Coverage with JaCoCo and Maven</a> &gt; <a href="index.source.html" class="el_package">chess</a> &gt; <span class="el_source">PGN_Formatter.java</span></div><h1>PGN_Formatter.java</h1><pre class="source lang-java linenums">package chess;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Scanner;
+
+import pieces.*;
+
+/**
+ * Játékállások beolvasásáért és lépések PGN formátummá alakításáért felelős
+ * osztály
+ */
+public class PGN_Formatter {
+    /**
+     * Privát konstruktor elrejteni a publikusat
+     */
+    private PGN_Formatter() {
+    }
+
+    private static List&lt;Piece&gt; loadedPosition;
+
+    /**
+     * Visszatér a betöltött pozícióban szereplő paraméterként kapott adott helyen,
+     * adott színű
+     * és adott típusú bábuval: ha nincs ilyen, akkor null-al tér vissza
+     * 
+     * @param color
+     * @param type
+     * @param pos
+     * @return Piece
+     */
+    private static Piece getPiece(PieceColor color, PieceType type, Position pos) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (Piece piece : loadedPosition) {</span>
+<span class="fc bfc" id="L44" title="All 6 branches covered.">            if (piece.getColor() == color &amp;&amp; piece.getType() == type &amp;&amp; piece.getPosition().equals(pos)) {</span>
+<span class="fc" id="L45">                return piece;</span>
+            }
+        }
+
+<span class="fc" id="L49">        return null;</span>
+    }
+
+    /**
+     * A paraméterként kapott betűt PieceType-á alakítja és visszatér vele
+     * 
+     * @param letter
+     * @return PieceType
+     */
+    private static PieceType getPieceTypeByLetter(String letter) {
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (letter.equals(letter.toLowerCase())) {</span>
+<span class="fc" id="L60">            return PieceType.PAWN;</span>
+        }
+
+        // szótár inicializálása statikus inicializáló blokkal
+<span class="fc" id="L64">        Map&lt;String, PieceType&gt; map = new HashMap&lt;&gt;() {</span>
+            {
+<span class="fc" id="L66">                put(&quot;Q&quot;, PieceType.QUEEN);</span>
+<span class="fc" id="L67">                put(&quot;K&quot;, PieceType.KING);</span>
+<span class="fc" id="L68">                put(&quot;B&quot;, PieceType.BISHOP);</span>
+<span class="fc" id="L69">                put(&quot;R&quot;, PieceType.ROOK);</span>
+<span class="fc" id="L70">                put(&quot;N&quot;, PieceType.KNIGHT);</span>
+            }
+        };
+
+<span class="fc" id="L74">        return map.get(letter);</span>
+    }
+
+    /**
+     * A paraméterként kapott típusnak visszatér a kezdőbetűjével
+     * 
+     * @param type
+     * @return String
+     */
+    private static String getLetterByPieceType(PieceType type) {
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (type == PieceType.PAWN) {</span>
+<span class="nc" id="L85">            return &quot;&quot;;</span>
+        }
+
+        // inicializálás statikus blokkal
+<span class="fc" id="L89">        Map&lt;PieceType, String&gt; map = new HashMap&lt;&gt;() {</span>
+            {
+<span class="fc" id="L91">                put(PieceType.QUEEN, &quot;Q&quot;);</span>
+<span class="fc" id="L92">                put(PieceType.KING, &quot;K&quot;);</span>
+<span class="fc" id="L93">                put(PieceType.BISHOP, &quot;B&quot;);</span>
+<span class="fc" id="L94">                put(PieceType.ROOK, &quot;R&quot;);</span>
+<span class="fc" id="L95">                put(PieceType.KNIGHT, &quot;N&quot;);</span>
+            }
+        };
+
+<span class="fc" id="L99">        return map.get(type);</span>
+    }
+
+    /**
+     * Visszatér a paraméterként kapott színű és típusú (javarészt tisztek)
+     * listájával, akik a betöltött állásban helyezkednek el.
+     * 
+     * @param color
+     * @param type
+     * @return
+     */
+    private static List&lt;Piece&gt; getOfficers(PieceColor color, PieceType type) {
+<span class="fc" id="L111">        List&lt;Piece&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        for (Piece piece : loadedPosition) {</span>
+<span class="fc bfc" id="L114" title="All 4 branches covered.">            if (piece.getColor() == color &amp;&amp; piece.getType() == type) {</span>
+<span class="fc" id="L115">                list.add(piece);</span>
+            }
+        }
+
+<span class="fc" id="L119">        return list;</span>
+    }
+
+    /**
+     * Visszatér a paraméterként kapott bábu összes lehetséges lépéseinek
+     * listájával.
+     * 
+     * @param piece
+     * @return
+     */
+    private static List&lt;Position&gt; getPossibleMoves(Piece piece) {
+<span class="fc" id="L130">        List&lt;Position&gt; positions = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (Position pos : piece.getEveryMove()) {</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">            if (Rules.isMovePossible(loadedPosition, piece, pos, piece.getColor(), false, false, null, null)) {</span>
+<span class="fc" id="L134">                positions.add(pos);</span>
+            }
+        }
+
+<span class="fc" id="L138">        return positions;</span>
+    }
+
+    /**
+     * Igaz, ha a paraméterként kapott lista rendelkezik a szintén paraméterként
+     * kapott lépéssel.
+     * Egyébként hamis.
+     * 
+     * @param list
+     * @param move
+     * @return
+     */
+    private static boolean containsMove(List&lt;Position&gt; list, Position move) {
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        for (Position pos : list) {</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            if (pos.equals(move)) {</span>
+<span class="fc" id="L153">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L157">        return false;</span>
+    }
+
+    /**
+     * Törli a betöltött állásból a paraméterként kapott mezőn elhelyezkedű bábut.
+     * Mivel egy mezőn csak egy bábu helyezkedhet el, így fontos, hogy pl. ütésnél
+     * először ezt a függvényt kell meghívni, majd mozgatni azt a bábut, aki üt,
+     * különben mindkét bábu törlődik.
+     * 
+     * @param pos
+     */
+    private static void deletePiece(Position pos) {
+<span class="fc" id="L169">        ListIterator&lt;Piece&gt; iter = loadedPosition.listIterator();</span>
+
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        while (iter.hasNext()) {</span>
+<span class="fc" id="L172">            Piece current = iter.next();</span>
+
+<span class="fc bfc" id="L174" title="All 2 branches covered.">            if (current.getPosition().equals(pos)) {</span>
+<span class="fc" id="L175">                iter.remove();</span>
+            }
+        }
+<span class="fc" id="L178">    }</span>
+
+    /**
+     * Beolvassa a paraméterként kapott fájlnévű .txt fájlból a lépéseket és
+     * formázva őket
+     * visszatér egy String-gel, amely ezeket a lépéseket tartalmazza. Ha nem
+     * létezik ilyen
+     * nevű szövegfájl, akkor FileNotFoundException-t dob.
+     * 
+     * @param textFile
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static String getMovesListed(String textFile) throws FileNotFoundException {
+<span class="fc" id="L192">        File readFile = null;</span>
+<span class="fc" id="L193">        String ret = &quot;&quot;;</span>
+
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (!textFile.contains(&quot;.txt&quot;)) {</span>
+<span class="fc" id="L196">            readFile = new File(&quot;saved_games/&quot; + textFile + &quot;.txt&quot;);</span>
+<span class="fc" id="L197">        } else {</span>
+<span class="fc" id="L198">            readFile = new File(&quot;saved_games/&quot; + textFile);</span>
+        }
+
+<span class="fc" id="L201">        Scanner scanner = new Scanner(readFile);</span>
+
+<span class="fc" id="L203">        String[] moves = scanner.nextLine().split(&quot; &quot;);</span>
+
+<span class="fc" id="L205">        scanner.close();</span>
+
+<span class="fc" id="L207">        int i = 1;</span>
+
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        for (String move : moves) {</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">            if (i % 2 == 1) {</span>
+<span class="fc" id="L211">                ret += move + &quot; &quot;;</span>
+<span class="fc" id="L212">            } else {</span>
+<span class="fc" id="L213">                ret += move + &quot;\n&quot;;</span>
+            }
+
+<span class="fc" id="L216">            i++;</span>
+        }
+
+<span class="fc" id="L219">        return ret;</span>
+    }
+
+    /**
+     * Igaz, ha a paraméterként kapott mezőn van bábu a betöltött állásban.
+     * Egyébként hamis.
+     * 
+     * @param pos
+     * @return
+     */
+    private static boolean isThereAPiece(Position pos) {
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">        for (Piece piece : loadedPosition) {</span>
+<span class="fc bfc" id="L231" title="All 2 branches covered.">            if (piece.getPosition().equals(pos)) {</span>
+<span class="fc" id="L232">                return true;</span>
+            }
+        }
+
+<span class="nc" id="L236">        return false;</span>
+    }
+
+    /**
+     * Hozzáad a jelenlegi álláshoz egy úgy tisztet a paraméterként színnel és adott
+     * mezőre.
+     * A tiszt &quot;típusát&quot; szintén paraméterként kapja meg.
+     * 
+     * @param typeString
+     * @param nextColor
+     * @param column
+     * @param row
+     */
+    private static void addOfficer(String typeString, PieceColor nextColor, String column, int row) {
+<span class="pc bpc" id="L250" title="4 of 5 branches missed.">        switch (getPieceTypeByLetter(typeString)) {</span>
+            case QUEEN:
+<span class="nc" id="L252">                loadedPosition.add(new Queen(nextColor, new Position(column, row)));</span>
+<span class="nc" id="L253">                break;</span>
+
+            case ROOK:
+<span class="fc" id="L256">                loadedPosition.add(new Rook(nextColor, new Position(column, row)));</span>
+<span class="fc" id="L257">                break;</span>
+
+            case KNIGHT:
+<span class="nc" id="L260">                loadedPosition.add(new Knight(nextColor, new Position(column, row)));</span>
+<span class="nc" id="L261">                break;</span>
+
+            case BISHOP:
+<span class="nc" id="L264">                loadedPosition.add(new Bishop(nextColor, new Position(column, row)));</span>
+<span class="nc" id="L265">                break;</span>
+
+            default:
+                break;
+        }
+<span class="fc" id="L270">    }</span>
+
+    /**
+     * Átalakulás lépés beolvasása esetén módosítja a betöltött állást a
+     * szabályoknak megfelelően.
+     * 
+     * @param actualMove
+     * @param nextColor
+     */
+    private static void promotion(String actualMove, PieceColor nextColor) {
+        // gyalog törlése az eggyel előtti sorból
+
+<span class="fc" id="L282">        String[] splitMove = actualMove.split(&quot;\\=&quot;);</span>
+<span class="fc" id="L283">        actualMove = splitMove[0];</span>
+<span class="fc" id="L284">        String typeString = splitMove[1];</span>
+
+        // axb8=Q pl.
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">        if (actualMove.contains(&quot;x&quot;)) {</span>
+<span class="fc" id="L288">            String pawnColumn = Character.toString(actualMove.charAt(0));</span>
+
+<span class="fc" id="L290">            String column = Character.toString(actualMove.charAt(2));</span>
+<span class="fc" id="L291">            int row = Character.getNumericValue(actualMove.charAt(3));</span>
+
+            // ütött bábu törlése
+<span class="fc" id="L294">            ListIterator&lt;Piece&gt; iterator = loadedPosition.listIterator();</span>
+
+<span class="fc bfc" id="L296" title="All 2 branches covered.">            while (iterator.hasNext()) {</span>
+<span class="fc" id="L297">                Piece current = iterator.next();</span>
+
+<span class="fc bfc" id="L299" title="All 2 branches covered.">                if (current.getPosition().equals(new Position(column, row))) {</span>
+<span class="fc" id="L300">                    iterator.remove();</span>
+                }
+            }
+
+            // gyalog törlése
+<span class="fc" id="L305">            iterator = loadedPosition.listIterator();</span>
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">            Position pawnPos = new Position(pawnColumn, nextColor == PieceColor.WHITE ? row - 1 : row + 1);</span>
+
+<span class="fc bfc" id="L308" title="All 2 branches covered.">            while (iterator.hasNext()) {</span>
+<span class="fc" id="L309">                Piece current = iterator.next();</span>
+
+<span class="pc bpc" id="L311" title="1 of 4 branches missed.">                if (current.getPosition().equals(pawnPos) &amp;&amp; current.getType() == PieceType.PAWN) {</span>
+<span class="fc" id="L312">                    iterator.remove();</span>
+                }
+            }
+
+<span class="fc" id="L316">            addOfficer(typeString, nextColor, column, row);</span>
+<span class="fc" id="L317">        } else {</span>
+<span class="nc" id="L318">            String column = Character.toString(actualMove.charAt(0));</span>
+<span class="nc" id="L319">            int row = Character.getNumericValue(actualMove.charAt(1));</span>
+
+            // gyalog törlése
+<span class="nc" id="L322">            ListIterator&lt;Piece&gt; iterator = loadedPosition.listIterator();</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">            Position pawnPos = new Position(column, nextColor == PieceColor.WHITE ? row - 1 : row + 1);</span>
+
+<span class="nc bnc" id="L325" title="All 2 branches missed.">            while (iterator.hasNext()) {</span>
+<span class="nc" id="L326">                Piece current = iterator.next();</span>
+
+<span class="nc bnc" id="L328" title="All 4 branches missed.">                if (current.getPosition().equals(pawnPos) &amp;&amp; current.getType() == PieceType.PAWN) {</span>
+<span class="nc" id="L329">                    iterator.remove();</span>
+                }
+            }
+
+<span class="nc" id="L333">            addOfficer(typeString, nextColor, column, row);</span>
+        }
+<span class="fc" id="L335">    }</span>
+
+    /**
+     * Megvalósítja a rövidsáncolás lépését.
+     * 
+     * @param nextColor
+     */
+    private static void shortCastling(PieceColor nextColor) {
+<span class="fc" id="L343">        int row = 8;</span>
+
+<span class="fc bfc" id="L345" title="All 2 branches covered.">        if (nextColor == PieceColor.WHITE) {</span>
+<span class="fc" id="L346">            row = 1;</span>
+        }
+
+<span class="fc" id="L349">        Piece king = getPiece(nextColor, PieceType.KING, new Position(&quot;e&quot;, row));</span>
+<span class="fc" id="L350">        Piece rook = getPiece(nextColor, PieceType.ROOK, new Position(&quot;h&quot;, row));</span>
+
+<span class="fc" id="L352">        king.setPosition(new Position(&quot;g&quot;, row));</span>
+<span class="fc" id="L353">        king.pieceHasMoved();</span>
+<span class="fc" id="L354">        rook.setPosition(new Position(&quot;f&quot;, row));</span>
+<span class="fc" id="L355">        rook.pieceHasMoved();</span>
+<span class="fc" id="L356">    }</span>
+
+    /**
+     * Megvalósítja a hosszúsáncolás lépését
+     * 
+     * @param nextColor
+     */
+    private static void longCastling(PieceColor nextColor) {
+<span class="nc" id="L364">        int row = 8;</span>
+
+<span class="nc bnc" id="L366" title="All 2 branches missed.">        if (nextColor == PieceColor.WHITE) {</span>
+<span class="nc" id="L367">            row = 1;</span>
+        }
+
+<span class="nc" id="L370">        Piece king = getPiece(nextColor, PieceType.KING, new Position(&quot;e&quot;, row));</span>
+<span class="nc" id="L371">        Piece rook = getPiece(nextColor, PieceType.ROOK, new Position(&quot;a&quot;, row));</span>
+
+<span class="nc" id="L373">        king.setPosition(new Position(&quot;c&quot;, row));</span>
+<span class="nc" id="L374">        king.pieceHasMoved();</span>
+<span class="nc" id="L375">        rook.setPosition(new Position(&quot;d&quot;, row));</span>
+<span class="nc" id="L376">        rook.pieceHasMoved();</span>
+<span class="nc" id="L377">    }</span>
+
+    /**
+     * A beolvasott lépésben szereplő ütést valósítja meg és módosítja
+     * ennek megfelelően az állást.
+     * 
+     * @param actualMove
+     * @param nextColor
+     */
+    private static void pieceTakenMove(String actualMove, PieceColor nextColor) {
+<span class="fc" id="L387">        PieceType movePieceType = getPieceTypeByLetter(Character.toString(actualMove.charAt(0)));</span>
+
+<span class="fc bfc" id="L389" title="All 2 branches covered.">        if (movePieceType == PieceType.PAWN) {</span>
+<span class="fc" id="L390">            String column = Character.toString(actualMove.charAt(2));</span>
+<span class="fc" id="L391">            int row = Character.getNumericValue(actualMove.charAt(3));</span>
+
+<span class="fc" id="L393">            Piece movePiece = getPiece(nextColor, movePieceType,</span>
+<span class="fc" id="L394">                    new Position(Character.toString(actualMove.charAt(0)),</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">                            nextColor == PieceColor.WHITE ? row - 1 : row + 1));</span>
+
+<span class="pc bpc" id="L397" title="1 of 2 branches missed.">            if (isThereAPiece(new Position(column, row))) {</span>
+<span class="fc" id="L398">                deletePiece(new Position(column, row));</span>
+<span class="fc" id="L399">            } else {</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">                deletePiece(new Position(column, row + (nextColor == PieceColor.WHITE ? -1 : 1)));</span>
+            }
+
+<span class="fc" id="L403">            movePiece.setPosition(new Position(column, row));</span>
+<span class="fc" id="L404">            movePiece.pieceHasMoved();</span>
+<span class="fc" id="L405">        } else {</span>
+<span class="fc" id="L406">            List&lt;Piece&gt; officers = getOfficers(nextColor, movePieceType);</span>
+
+            // egyértelmű a lépés, hogy melyik tiszt lép oda
+<span class="pc bpc" id="L409" title="1 of 2 branches missed.">            if (actualMove.length() == 4) {</span>
+<span class="fc" id="L410">                String column = Character.toString(actualMove.charAt(2));</span>
+<span class="fc" id="L411">                int row = Character.getNumericValue(actualMove.charAt(3));</span>
+
+<span class="fc bfc" id="L413" title="All 2 branches covered.">                if (officers.size() == 1) {</span>
+<span class="fc" id="L414">                    deletePiece(new Position(column, row));</span>
+
+<span class="fc" id="L416">                    officers.get(0).setPosition(new Position(column, row));</span>
+<span class="fc" id="L417">                    officers.get(0).pieceHasMoved();</span>
+<span class="fc" id="L418">                } else {</span>
+<span class="fc" id="L419">                    deletePiece(new Position(column, row));</span>
+
+<span class="fc bfc" id="L421" title="All 2 branches covered.">                    if (containsMove(getPossibleMoves(officers.get(0)), new Position(column, row))) {</span>
+<span class="fc" id="L422">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="fc" id="L423">                        officers.get(0).pieceHasMoved();</span>
+<span class="fc" id="L424">                    } else {</span>
+<span class="fc" id="L425">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="fc" id="L426">                        officers.get(1).pieceHasMoved();</span>
+                    }
+                }
+<span class="fc" id="L429">            } else {</span>
+<span class="nc" id="L430">                Character specified = actualMove.charAt(1);</span>
+<span class="nc" id="L431">                String column = Character.toString(actualMove.charAt(3));</span>
+<span class="nc" id="L432">                int row = Character.getNumericValue(actualMove.charAt(4));</span>
+
+<span class="nc" id="L434">                deletePiece(new Position(column, row));</span>
+
+                // sor van megadva
+<span class="nc bnc" id="L437" title="All 2 branches missed.">                if (Character.isDigit(specified)) {</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">                    if (officers.get(0).getPosition().getRow() == Character.getNumericValue(specified)) {</span>
+<span class="nc" id="L439">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="nc" id="L440">                        officers.get(0).pieceHasMoved();</span>
+<span class="nc" id="L441">                    } else {</span>
+<span class="nc" id="L442">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="nc" id="L443">                        officers.get(1).pieceHasMoved();</span>
+                    }
+<span class="nc" id="L445">                } else { // oszlop esetén</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">                    if (officers.get(0).getPosition().columnToString().equals(Character.toString(specified))) {</span>
+<span class="nc" id="L447">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="nc" id="L448">                        officers.get(0).pieceHasMoved();</span>
+<span class="nc" id="L449">                    } else {</span>
+<span class="nc" id="L450">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="nc" id="L451">                        officers.get(1).pieceHasMoved();</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L456">    }</span>
+
+    /**
+     * A beolvasott lépést, melyben nem szerepel ütés, valósítja meg
+     * és módosítja az állást.
+     * 
+     * @param actualMove
+     * @param nextColor
+     */
+    private static void regularMove(String actualMove, PieceColor nextColor) {
+<span class="fc" id="L466">        PieceType movePieceType = getPieceTypeByLetter(Character.toString(actualMove.charAt(0)));</span>
+
+<span class="fc bfc" id="L468" title="All 2 branches covered.">        if (movePieceType == PieceType.PAWN) {</span>
+<span class="fc" id="L469">            String column = Character.toString(actualMove.charAt(0));</span>
+<span class="fc" id="L470">            int row = Character.getNumericValue(actualMove.charAt(1));</span>
+
+<span class="fc" id="L472">            Piece movePiece = getPiece(nextColor, movePieceType,</span>
+<span class="fc bfc" id="L473" title="All 2 branches covered.">                    new Position(column, nextColor == PieceColor.WHITE ? row - 1 : row + 1));</span>
+
+            // két lépés esetén
+<span class="fc bfc" id="L476" title="All 2 branches covered.">            if (movePiece == null) {</span>
+<span class="fc" id="L477">                movePiece = getPiece(nextColor, movePieceType,</span>
+<span class="fc bfc" id="L478" title="All 2 branches covered.">                        new Position(column, nextColor == PieceColor.WHITE ? row - 2 : row + 2));</span>
+            }
+
+<span class="fc" id="L481">            movePiece.setPosition(new Position(column, row));</span>
+<span class="fc" id="L482">            movePiece.pieceHasMoved();</span>
+<span class="fc" id="L483">        } else {</span>
+<span class="fc" id="L484">            List&lt;Piece&gt; officers = getOfficers(nextColor, movePieceType);</span>
+
+            // egyértelmű a lépés, hogy melyik tiszt lép oda
+<span class="fc bfc" id="L487" title="All 2 branches covered.">            if (actualMove.length() == 3) {</span>
+<span class="fc" id="L488">                String column = Character.toString(actualMove.charAt(1));</span>
+<span class="fc" id="L489">                int row = Character.getNumericValue(actualMove.charAt(2));</span>
+
+<span class="fc bfc" id="L491" title="All 2 branches covered.">                if (officers.size() == 1) {</span>
+<span class="fc" id="L492">                    officers.get(0).setPosition(new Position(column, row));</span>
+<span class="fc" id="L493">                    officers.get(0).pieceHasMoved();</span>
+<span class="fc" id="L494">                } else {</span>
+<span class="fc bfc" id="L495" title="All 2 branches covered.">                    if (containsMove(getPossibleMoves(officers.get(0)), new Position(column, row))) {</span>
+<span class="fc" id="L496">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="fc" id="L497">                        officers.get(0).pieceHasMoved();</span>
+<span class="fc" id="L498">                    } else {</span>
+<span class="fc" id="L499">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="fc" id="L500">                        officers.get(1).pieceHasMoved();</span>
+                    }
+                }
+<span class="fc" id="L503">            } else {</span>
+<span class="fc" id="L504">                Character specified = actualMove.charAt(1);</span>
+<span class="fc" id="L505">                String column = Character.toString(actualMove.charAt(2));</span>
+<span class="fc" id="L506">                int row = Character.getNumericValue(actualMove.charAt(3));</span>
+
+                // sor van megadva
+<span class="pc bpc" id="L509" title="1 of 2 branches missed.">                if (Character.isDigit(specified)) {</span>
+<span class="nc bnc" id="L510" title="All 2 branches missed.">                    if (officers.get(0).getPosition().getRow() == Character.getNumericValue(specified)) {</span>
+<span class="nc" id="L511">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="nc" id="L512">                        officers.get(0).pieceHasMoved();</span>
+<span class="nc" id="L513">                    } else {</span>
+<span class="nc" id="L514">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="nc" id="L515">                        officers.get(1).pieceHasMoved();</span>
+                    }
+<span class="nc" id="L517">                } else { // oszlop esetén</span>
+<span class="pc bpc" id="L518" title="1 of 2 branches missed.">                    if (officers.get(0).getPosition().columnToString().equals(Character.toString(specified))) {</span>
+<span class="fc" id="L519">                        officers.get(0).setPosition(new Position(column, row));</span>
+<span class="fc" id="L520">                        officers.get(0).pieceHasMoved();</span>
+<span class="fc" id="L521">                    } else {</span>
+<span class="nc" id="L522">                        officers.get(1).setPosition(new Position(column, row));</span>
+<span class="nc" id="L523">                        officers.get(1).pieceHasMoved();</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L528">    }</span>
+
+    /**
+     * Beolvassa a paraméterként kapott szövegfájl tartalmát és azokat egy
+     * játékállássá (azaz bábuk listájává) alakítja. Ha nem létezik ilyen fájl,
+     * akkor
+     * FileNotFoundException-t dob.
+     * 
+     * @param textFile
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static List&lt;Piece&gt; readFromTextFile(String textFile) throws FileNotFoundException {
+<span class="fc" id="L541">        File readFile = null;</span>
+
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">        if (!textFile.contains(&quot;.txt&quot;)) {</span>
+<span class="fc" id="L544">            readFile = new File(&quot;saved_games/&quot; + textFile + &quot;.txt&quot;);</span>
+<span class="fc" id="L545">        } else {</span>
+<span class="nc" id="L546">            readFile = new File(&quot;saved_games/&quot; + textFile);</span>
+        }
+
+<span class="pc bpc" id="L549" title="1 of 2 branches missed.">        if (!readFile.exists()) {</span>
+<span class="nc" id="L550">            return null;</span>
+        }
+
+<span class="fc" id="L553">        loadedPosition = Board.getStartingPosition();</span>
+<span class="fc" id="L554">        Scanner scanner = new Scanner(readFile);</span>
+<span class="fc" id="L555">        String[] moves = scanner.nextLine().split(&quot; &quot;);</span>
+
+<span class="fc" id="L557">        scanner.close();</span>
+
+<span class="fc bfc" id="L559" title="All 2 branches covered.">        for (String move : moves) {</span>
+<span class="fc" id="L560">            PieceColor nextColor = PieceColor.BLACK;</span>
+<span class="fc" id="L561">            String actualMove = move;</span>
+
+<span class="fc bfc" id="L563" title="All 2 branches covered.">            if (move.contains(&quot;.&quot;)) {</span>
+<span class="fc" id="L564">                nextColor = PieceColor.WHITE;</span>
+<span class="fc" id="L565">                String[] splitMove = move.split(&quot;\\.&quot;);</span>
+<span class="fc" id="L566">                actualMove = splitMove[1];</span>
+            }
+
+<span class="fc bfc" id="L569" title="All 2 branches covered.">            if (actualMove.contains(&quot;+&quot;)) {</span>
+<span class="fc" id="L570">                actualMove = actualMove.split(&quot;\\+&quot;)[0];</span>
+            }
+
+            // átalakulás
+<span class="fc bfc" id="L574" title="All 2 branches covered.">            if (actualMove.contains(&quot;=&quot;)) {</span>
+<span class="fc" id="L575">                promotion(actualMove, nextColor);</span>
+<span class="fc" id="L576">                continue;</span>
+            }
+
+            // rövidsánc
+<span class="fc bfc" id="L580" title="All 2 branches covered.">            if (actualMove.equals(&quot;O-O&quot;)) {</span>
+<span class="fc" id="L581">                shortCastling(nextColor);</span>
+<span class="fc" id="L582">                continue;</span>
+            }
+
+            // hosszúsánc
+<span class="pc bpc" id="L586" title="1 of 2 branches missed.">            if (actualMove.equals(&quot;O-O-O&quot;)) {</span>
+<span class="nc" id="L587">                longCastling(nextColor);</span>
+<span class="nc" id="L588">                continue;</span>
+            }
+
+            // történt-e ütés
+<span class="fc bfc" id="L592" title="All 2 branches covered.">            if (actualMove.contains(&quot;x&quot;)) {</span>
+<span class="fc" id="L593">                pieceTakenMove(actualMove, nextColor);</span>
+<span class="fc" id="L594">            } else {</span>
+<span class="fc" id="L595">                regularMove(actualMove, nextColor);</span>
+            }
+        }
+
+<span class="fc" id="L599">        return loadedPosition;</span>
+    }
+
+    /**
+     * Igaz, ha a paraméterként kapott bábu lehetséges lépései között szerepel az
+     * adott állásban
+     * a szintén paraméterként kapott lépés. Egyébként hamis.
+     * 
+     * @param piece
+     * @param move
+     * @param actualPosition
+     * @return
+     */
+    private static boolean isInPossibleMoves(Piece piece, Position move, List&lt;Piece&gt; actualPosition) {
+<span class="fc" id="L613">        List&lt;Position&gt; possibleMoves = piece.getEveryMove();</span>
+<span class="fc" id="L614">        ListIterator&lt;Position&gt; iter = possibleMoves.listIterator();</span>
+
+<span class="fc bfc" id="L616" title="All 2 branches covered.">        while (iter.hasNext()) {</span>
+<span class="fc" id="L617">            Position current = iter.next();</span>
+
+<span class="fc bfc" id="L619" title="All 2 branches covered.">            if (!Rules.isMovePossible(actualPosition, piece, current, piece.getColor(), true, true, null, null)) {</span>
+<span class="fc" id="L620">                iter.remove();</span>
+            }
+        }
+
+<span class="fc bfc" id="L624" title="All 2 branches covered.">        for (Position pos : possibleMoves) {</span>
+<span class="pc bpc" id="L625" title="1 of 2 branches missed.">            if (pos.equals(move)) {</span>
+<span class="nc" id="L626">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L630">        return false;</span>
+    }
+
+    /**
+     * A paraméterként kapott lépést (bábu és mező) alakítja PGN formátum szerinti
+     * lépésre és visszatér a lépést tartalmazó String-gel.
+     * 
+     * @param piece
+     * @param movedTo
+     * @param wasPieceTaken
+     * @param actualPosition
+     * @return
+     */
+    public static String getMoveFormatted(Piece piece, Position movedTo, boolean wasPieceTaken,
+            List&lt;Piece&gt; actualPosition) {
+<span class="fc" id="L645">        loadedPosition = actualPosition;</span>
+<span class="fc" id="L646">        String move = &quot;&quot;;</span>
+
+<span class="pc bpc" id="L648" title="3 of 4 branches missed.">        if (piece.getType() == PieceType.KING &amp;&amp; (piece.getPosition().equals(new Position(&quot;e&quot;, 1))</span>
+<span class="nc bnc" id="L649" title="All 2 branches missed.">                || piece.getPosition().equals(new Position(&quot;e&quot;, 8)))) {</span>
+<span class="nc bnc" id="L650" title="All 4 branches missed.">            if (movedTo.equals(new Position(&quot;g&quot;, 1)) || movedTo.equals(new Position(&quot;g&quot;, 8))) {</span>
+<span class="nc" id="L651">                return &quot;O-O&quot;;</span>
+<span class="nc bnc" id="L652" title="All 4 branches missed.">            } else if (movedTo.equals(new Position(&quot;c&quot;, 1)) || movedTo.equals(new Position(&quot;c&quot;, 8))) {</span>
+<span class="nc" id="L653">                return &quot;O-O-O&quot;;</span>
+            }
+        }
+
+<span class="fc bfc" id="L657" title="All 2 branches covered.">        if (piece.getType() == PieceType.PAWN) {</span>
+<span class="fc bfc" id="L658" title="All 2 branches covered.">            if (wasPieceTaken) {</span>
+<span class="fc" id="L659">                move += piece.getPosition().columnToString() + &quot;x&quot; + movedTo;</span>
+<span class="fc" id="L660">            } else {</span>
+<span class="fc" id="L661">                move += movedTo;</span>
+            }
+<span class="fc" id="L663">        } else {</span>
+<span class="fc" id="L664">            List&lt;Piece&gt; officers = getOfficers(piece.getColor(), piece.getType());</span>
+
+            // első betű a tiszt típusa
+<span class="fc" id="L667">            move += getLetterByPieceType(piece.getType());</span>
+
+<span class="pc bpc" id="L669" title="1 of 4 branches missed.">            if (officers.size() == 2 &amp;&amp; isInPossibleMoves(officers.get(0), movedTo, actualPosition)</span>
+<span class="nc bnc" id="L670" title="All 2 branches missed.">                    &amp;&amp; isInPossibleMoves(officers.get(1), movedTo, actualPosition)) {</span>
+                // ha mindkét tiszt odaléphet, akkor nem egyértelmű
+<span class="nc bnc" id="L672" title="All 2 branches missed.">                if (officers.get(0).getPosition().getRow() == officers.get(1).getPosition().getRow()) {</span>
+<span class="nc" id="L673">                    move += piece.getPosition().columnToString();</span>
+<span class="nc bnc" id="L674" title="All 2 branches missed.">                } else if (officers.get(0).getPosition().getColumn() == officers.get(1).getPosition().getColumn()) {</span>
+<span class="nc" id="L675">                    move += piece.getPosition().getRow();</span>
+<span class="nc" id="L676">                } else {</span>
+<span class="nc" id="L677">                    move += piece.getPosition().columnToString();</span>
+                }
+            }
+
+<span class="fc bfc" id="L681" title="All 2 branches covered.">            if (wasPieceTaken) {</span>
+<span class="fc" id="L682">                move += &quot;x&quot;;</span>
+            }
+
+<span class="fc" id="L685">            move += movedTo.toString();</span>
+        }
+
+<span class="fc" id="L688">        return move;</span>
+    }
+
+    /**
+     * Elmenti a paraméterként kapott listát egy .txt fájlba.
+     * A fájl neve a mentés időpontja &quot;yyyy-MM-dd HH-mm-ss&quot; formátumban.
+     * Esetleges fájlkezelési hiba esetén IOException-t dob.
+     * 
+     * @param moveList
+     * @throws IOException
+     */
+    public static void saveGame(String moveList) throws IOException {
+<span class="nc" id="L700">        LocalDateTime date = LocalDateTime.now();</span>
+
+<span class="nc" id="L702">        BufferedWriter file = new BufferedWriter(new FileWriter(</span>
+<span class="nc" id="L703">                &quot;saved_games/&quot; + date.format(DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH-mm-ss&quot;)) + &quot;.txt&quot;));</span>
+
+<span class="nc bnc" id="L705" title="All 2 branches missed.">        for (char c : moveList.toCharArray()) {</span>
+<span class="nc bnc" id="L706" title="All 2 branches missed.">            if (c != '\n') {</span>
+<span class="nc" id="L707">                file.write(c);</span>
+<span class="nc" id="L708">            } else {</span>
+<span class="nc" id="L709">                file.write(&quot; &quot;);</span>
+            }
+        }
+
+<span class="nc" id="L713">        file.close();</span>
+<span class="nc" id="L714">    }</span>
+
+    /**
+     * Visszatér a paraméterként kapott fájlnevű fájl lépéseinek számával.
+     * Egy lépést a fehér lépése (n.lépés) határoz meg, ahol n a lépés sorszáma.
+     * Fájl megnyitása esetén fellépő hiba esetén FileNotFoundException-t dob.
+     * 
+     * @param textFile
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static int getNumberOfMoves(String textFile) throws FileNotFoundException {
+<span class="fc" id="L726">        File readFile = null;</span>
+
+<span class="pc bpc" id="L728" title="1 of 2 branches missed.">        if (!textFile.contains(&quot;.txt&quot;)) {</span>
+<span class="fc" id="L729">            readFile = new File(&quot;saved_games/&quot; + textFile + &quot;.txt&quot;);</span>
+<span class="fc" id="L730">        } else {</span>
+<span class="nc" id="L731">            readFile = new File(&quot;saved_games/&quot; + textFile);</span>
+        }
+
+<span class="fc" id="L734">        Scanner scanner = new Scanner(readFile);</span>
+
+<span class="fc" id="L736">        String line = scanner.nextLine();</span>
+<span class="fc" id="L737">        int numberOfNewLine = 0;</span>
+
+<span class="fc bfc" id="L739" title="All 2 branches covered.">        for (char c : line.toCharArray()) {</span>
+<span class="fc bfc" id="L740" title="All 2 branches covered.">            if (c == '.') {</span>
+<span class="fc" id="L741">                numberOfNewLine++;</span>
+            }
+        }
+
+<span class="fc" id="L745">        scanner.close();</span>
+
+<span class="fc" id="L747">        return numberOfNewLine + 1;</span>
+    }
+
+    /**
+     * Visszatér a paraméterként kapott fájlnevű fájl lépései alapján a következő
+     * oldal színével. Fájl megnyitása esetén fellépő hiba esetén
+     * FileNotFoundException-t dob.
+     * 
+     * @param textFile
+     * @return
+     * @throws FileNotFoundException
+     */
+    public static PieceColor getNextMoveColor(String textFile) throws FileNotFoundException {
+<span class="fc" id="L760">        File readFile = null;</span>
+
+<span class="pc bpc" id="L762" title="1 of 2 branches missed.">        if (!textFile.contains(&quot;.txt&quot;)) {</span>
+<span class="fc" id="L763">            readFile = new File(&quot;saved_games/&quot; + textFile + &quot;.txt&quot;);</span>
+<span class="fc" id="L764">        } else {</span>
+<span class="nc" id="L765">            readFile = new File(&quot;saved_games/&quot; + textFile);</span>
+        }
+
+<span class="fc" id="L768">        Scanner scanner = new Scanner(readFile);</span>
+<span class="fc" id="L769">        String[] moves = scanner.nextLine().split(&quot; &quot;);</span>
+
+<span class="fc" id="L771">        scanner.close();</span>
+
+<span class="pc bpc" id="L773" title="1 of 2 branches missed.">        if (moves[moves.length - 1].contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L774">            return PieceColor.BLACK;</span>
+        }
+
+<span class="fc" id="L777">        return PieceColor.WHITE;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

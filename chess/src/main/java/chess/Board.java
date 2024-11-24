@@ -158,6 +158,15 @@ public class Board {
     }
 
     /**
+     * movesListed paraméter getter függvénye
+     * 
+     * @return String
+     */
+    public String getMovesListed() {
+        return movesListed;
+    }
+
+    /**
      * Visszaadja a paraméterként kapott mezőn elhelyezkedő bábut;
      * ha nincs ilyen, akkor null a visszatérési érték
      * 
@@ -259,15 +268,6 @@ public class Board {
 
         movesTextArea.repaint();
         movesTextArea.setText(movesListed);
-    }
-
-    /**
-     * movesListed paraméter getter függvénye
-     * 
-     * @return String
-     */
-    public static String getMovesListedVariable() {
-        return movesListed;
     }
 
     /**

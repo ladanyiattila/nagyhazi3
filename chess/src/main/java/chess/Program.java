@@ -163,7 +163,7 @@ public class Program {
         JButton saveGame = new JButton("Save game");
         saveGame.addActionListener((ActionEvent ae) -> {
             try {
-                PGN_Formatter.saveGame(movesText.getText());
+                PGN_Formatter.saveGame(board.getMovesListed());
             } catch (IOException exception) {
                 exception.printStackTrace();
             }

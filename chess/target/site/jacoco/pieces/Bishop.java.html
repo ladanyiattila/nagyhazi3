@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bishop.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Coverage with JaCoCo and Maven</a> &gt; <a href="index.source.html" class="el_package">pieces</a> &gt; <span class="el_source">Bishop.java</span></div><h1>Bishop.java</h1><pre class="source lang-java linenums">package pieces;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A futó bábut megvalósító osztály.
+ */
+public class Bishop extends Piece {
+    /**
+     * Bishop konstruktor.
+     * Létrehoz egy futót az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
+<span class="fc" id="L17">    public Bishop(PieceColor c, Position p) {</span>
+<span class="fc" id="L18">        this.color = c;</span>
+<span class="fc" id="L19">        this.position = p;</span>
+
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (c == PieceColor.WHITE) {</span>
+<span class="fc" id="L22">            this.imageName = &quot;white_bishop.png&quot;;</span>
+<span class="fc" id="L23">        } else {</span>
+<span class="fc" id="L24">            this.imageName = &quot;black_bishop.png&quot;;</span>
+        }
+
+<span class="fc" id="L27">        type = PieceType.BISHOP;</span>
+<span class="fc" id="L28">        inStartingPosition = true;</span>
+<span class="fc" id="L29">    }</span>
+
+    
+    /**
+     * Lehetséges lépések:
+     * minden átlón annyit, amíg akadályba nem ütközik
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List&lt;Position&gt;
+     */
+    @Override
+    public List&lt;Position&gt; getEveryMove() {
+<span class="fc" id="L42">        List&lt;Position&gt; positions = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L44">        Position move = position.rightDiagonal(color, Direction.FORWARD);</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        while (move != null) {</span>
+<span class="fc" id="L47">            positions.add(move);</span>
+<span class="fc" id="L48">            move = move.rightDiagonal(color, Direction.FORWARD);</span>
+        }
+
+<span class="fc" id="L51">        move = position.rightDiagonal(color, Direction.BACKWARD);</span>
+
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        while (move != null) {</span>
+<span class="fc" id="L54">            positions.add(move);</span>
+<span class="fc" id="L55">            move = move.rightDiagonal(color, Direction.BACKWARD);</span>
+        }
+
+<span class="fc" id="L58">        move = position.leftDiagonal(color, Direction.FORWARD);</span>
+
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        while (move != null) {</span>
+<span class="fc" id="L61">            positions.add(move);</span>
+<span class="fc" id="L62">            move = move.leftDiagonal(color, Direction.FORWARD);</span>
+        }
+
+<span class="fc" id="L65">        move = position.leftDiagonal(color, Direction.BACKWARD);</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        while (move != null) {</span>
+<span class="fc" id="L68">            positions.add(move);</span>
+<span class="fc" id="L69">            move = move.leftDiagonal(color, Direction.BACKWARD);</span>
+        }
+
+<span class="fc" id="L72">        return positions;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

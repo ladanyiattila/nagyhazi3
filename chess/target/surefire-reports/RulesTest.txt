@@ -1,0 +1,7 @@
+-------------------------------------------------------------------------------
+Test set: RulesTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.111 s - in RulesTest
+RulesTest.isMovePossibleTest  Time elapsed: 0.083 s
+RulesTest.isMovePossibleCastlingTest  Time elapsed: 0.014 s
+RulesTest.getEndOfGameTest  Time elapsed: 0.009 s

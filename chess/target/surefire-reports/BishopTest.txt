@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
 Test set: BishopTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s - in BishopTest
-BishopTest.movementTest  Time elapsed: 0.006 s
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s - in BishopTest
+BishopTest.movementTest  Time elapsed: 0.004 s

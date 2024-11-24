@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pawn.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Coverage with JaCoCo and Maven</a> &gt; <a href="index.source.html" class="el_package">pieces</a> &gt; <span class="el_source">Pawn.java</span></div><h1>Pawn.java</h1><pre class="source lang-java linenums">package pieces;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A gyalog bábut megvalósító osztály.
+ */
+public class Pawn extends Piece {
+    private boolean movedTwoAtStart;
+
+    /**
+     * Pawn konstruktor.
+     * Létrehoz egy gyalogot az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
+<span class="fc" id="L19">    public Pawn(PieceColor c, Position p) {</span>
+<span class="fc" id="L20">        this.color = c;</span>
+<span class="fc" id="L21">        this.position = p;</span>
+
+<span class="fc bfc" id="L23" title="All 2 branches covered.">        if (c == PieceColor.WHITE) {</span>
+<span class="fc" id="L24">            this.imageName = &quot;white_pawn.png&quot;;</span>
+<span class="fc" id="L25">        } else {</span>
+<span class="fc" id="L26">            this.imageName = &quot;black_pawn.png&quot;;</span>
+        }
+
+<span class="fc" id="L29">        type = PieceType.PAWN;</span>
+<span class="fc" id="L30">        inStartingPosition = true;</span>
+<span class="fc" id="L31">        movedTwoAtStart = false;</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * Lehetséges lépések:
+     * - 1 lépés előre
+     * - 2 lépés előre
+     * - 1 lépés átlósan jobbra
+     * - 1 lépés átlósan balra
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List&lt;Position&gt;
+     */
+    @Override
+    public List&lt;Position&gt; getEveryMove() {
+<span class="fc" id="L47">        List&lt;Position&gt; positions = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L49">        Position move = position.forward(color);</span>
+
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L52">            positions.add(move);</span>
+        }
+
+        // kezdő sorból 2 lépés is lehetséges
+<span class="fc bfc" id="L56" title="All 4 branches covered.">        if ((color == PieceColor.WHITE &amp;&amp; position.getRow() == 2) </span>
+<span class="fc bfc" id="L57" title="All 4 branches covered.">        || (color == PieceColor.BLACK &amp;&amp; position.getRow() == 7)) {</span>
+<span class="fc" id="L58">            positions.add(position.forward(color).forward(color));</span>
+        }
+
+<span class="fc" id="L61">        move = position.rightDiagonal(color, Direction.FORWARD);</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (move != null) {</span>
+<span class="fc" id="L64">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L67">        move = position.leftDiagonal(color, Direction.FORWARD);</span>
+
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (move != null) {</span>
+<span class="fc" id="L70">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L73">        return positions;</span>
+    }
+
+    
+    /**
+     * movedTwoAtStart getter függvénye: en passant lépés vizsgálatánál
+     * használatos
+     * 
+     * @return boolean
+     */
+    public boolean getMovedTwoAtStart() {
+<span class="nc" id="L84">        return movedTwoAtStart;</span>
+    }
+
+    /**
+     * movedTwoAtStart &quot;setter&quot; függvénye: ha kettőt lép a gyalog
+     * a kezdő pozícióból, akkor movedTwoAtStart igaz lesz;
+     * en passant lépés vizsgálatánál használatos
+     */
+    public void setTwoMove() {
+<span class="nc" id="L93">        movedTwoAtStart = true;</span>
+<span class="nc" id="L94">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
