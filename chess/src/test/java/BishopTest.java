@@ -20,6 +20,8 @@ public class BishopTest {
 
     @Test
     void movementTest() {
+        System.out.println("asdasdads");
+
         List<Position> whiteMovementList = whiteBishop.getEveryMove();
         List<Position> expectedList = new ArrayList<>(List.of(
                 new Position("d", 2),

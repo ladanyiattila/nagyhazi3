@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>King.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Coverage with JaCoCo and Maven</a> &gt; <a href="index.source.html" class="el_package">pieces</a> &gt; <span class="el_source">King.java</span></div><h1>King.java</h1><pre class="source lang-java linenums">package pieces;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A király bábut megvalósító osztály.
+ */
+public class King extends Piece {
+    /**
+     * King konstruktor.
+     * Létrehoz egy királyt az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
+<span class="fc" id="L17">    public King(PieceColor c, Position p) {</span>
+<span class="fc" id="L18">        this.color = c;</span>
+<span class="fc" id="L19">        this.position = p;</span>
+
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (c == PieceColor.WHITE) {</span>
+<span class="fc" id="L22">            this.imageName = &quot;white_king.png&quot;;</span>
+<span class="fc" id="L23">        } else {</span>
+<span class="fc" id="L24">            this.imageName = &quot;black_king.png&quot;;</span>
+        }
+
+<span class="fc" id="L27">        type = PieceType.KING;</span>
+<span class="fc" id="L28">        inStartingPosition = true;</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+     * Lehetséges lépések:
+     * minden irányba egyet, ha lehetséges
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List&lt;Position&gt;
+     */
+    @Override
+    public List&lt;Position&gt; getEveryMove() {
+<span class="fc" id="L41">        List&lt;Position&gt; positions = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L43">        Position move = position.forward(color);</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L45">            positions.add(move);</span>
+        }
+        
+<span class="fc" id="L48">        move = position.backwards(color);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (move != null) {</span>
+<span class="fc" id="L50">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L53">        move = position.left(color);</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L55">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L58">        move = position.right(color);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L60">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L63">        move = position.rightDiagonal(color, Direction.FORWARD);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L65">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L68">        move = position.rightDiagonal(color, Direction.BACKWARD);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (move != null) {</span>
+<span class="fc" id="L70">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L73">        move = position.leftDiagonal(color, Direction.FORWARD);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (move != null) {</span>
+<span class="fc" id="L75">            positions.add(move);</span>
+        }
+
+<span class="fc" id="L78">        move = position.leftDiagonal(color, Direction.BACKWARD);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (move != null) {</span>
+<span class="fc" id="L80">            positions.add(move);</span>
+        }
+
+        // sáncolás (a király még nem mozdult meg az alap pozícióból)
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (this.inStartingPosition) {</span>
+<span class="pc bpc" id="L85" title="1 of 4 branches missed.">            if (this.color == PieceColor.WHITE &amp;&amp; this.getPosition().equals(new Position(&quot;e&quot;, 1))) {</span>
+<span class="fc" id="L86">                positions.add(new Position(&quot;g&quot;, 1));</span>
+<span class="fc" id="L87">                positions.add(new Position(&quot;c&quot;, 1));</span>
+<span class="pc bpc" id="L88" title="2 of 4 branches missed.">            } else if (this.color == PieceColor.BLACK &amp;&amp; this.getPosition().equals(new Position(&quot;e&quot;, 8))) {</span>
+<span class="nc" id="L89">                positions.add(new Position(&quot;g&quot;, 8));</span>
+<span class="nc" id="L90">                positions.add(new Position(&quot;c&quot;, 8));</span>
+            }   
+        }
+
+<span class="fc" id="L94">        return positions;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

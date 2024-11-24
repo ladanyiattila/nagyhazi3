@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Rules.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Coverage with JaCoCo and Maven</a> &gt; <a href="index.source.html" class="el_package">chess</a> &gt; <span class="el_source">Rules.java</span></div><h1>Rules.java</h1><pre class="source lang-java linenums">package chess;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.function.UnaryOperator;
+
+import pieces.*;
+
+/**
+ * A szabályrendszer megvalósításáért felelős osztály.
+ */
+public class Rules {
+    /**
+     * Privát konstruktor a publikus elrejtése céljából
+     */
+    private Rules() {}
+
+    /**
+     * Ellenőrzi, hogy az adott irányba nincs-e &quot;útban&quot; másik bábu
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param function
+     * @param checkForChecksAfterMove
+     * @return boolean
+     */
+    private static boolean possibleInThatWay(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            UnaryOperator&lt;Position&gt; function, boolean checkForChecksAfterMove) {
+<span class="fc" id="L31">        Position movePosition = new Position(movePiece.getPosition().getColumn(), movePiece.getPosition().getRow());</span>
+<span class="fc" id="L32">        movePosition = function.apply(movePosition);</span>
+
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        while (movePosition != null) {</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            if (movePosition.equals(move)) {</span>
+<span class="fc" id="L36">                break;</span>
+            }
+
+<span class="fc bfc" id="L39" title="All 2 branches covered.">            for (Piece piece : actualPosition) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">                if (piece.getPosition().equals(movePosition)) {</span>
+<span class="fc" id="L41">                    return false;</span>
+                }
+            }
+
+<span class="fc" id="L45">            movePosition = function.apply(movePosition);</span>
+        }
+
+<span class="fc" id="L48">        Piece king = null;</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+<span class="fc bfc" id="L50" title="All 4 branches covered.">            if (piece.getType() == PieceType.KING &amp;&amp; piece.getColor() == movePiece.getColor()) {</span>
+<span class="fc" id="L51">                king = piece;</span>
+            }
+        }
+
+<span class="pc bpc" id="L55" title="3 of 4 branches missed.">        return !(checkForChecksAfterMove &amp;&amp; isKingInCheckAfterMove(actualPosition, movePiece, move, king));</span>
+    }
+
+    /**
+     * Igaz a visszatérési értéke, ha az adott állásban olyan bábu helyezkedik el a
+     * paraméterként kapott mezőn, ami színe nem a paraméterként kapott szín.
+     * 
+     * @param actualPosition
+     * @param position
+     * @param color
+     * @return boolean
+     */
+    private static boolean isAPieceThere(List&lt;Piece&gt; actualPosition, Position position, PieceColor color) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+<span class="pc bpc" id="L69" title="1 of 4 branches missed.">            if (piece.getPosition().equals(position) &amp;&amp; piece.getColor() != color) {</span>
+<span class="fc" id="L70">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L74">        return false;</span>
+    }
+
+    /**
+     * Igaz, ha a lépés elvégzése után a király sakkban marad.
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param king
+     * @return boolean
+     */
+    private static boolean isKingInCheckAfterMove(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            Piece king) {
+<span class="fc" id="L88">        List&lt;Piece&gt; actualPositionClone = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+<span class="fc" id="L91">            actualPositionClone.add(piece);</span>
+        }
+
+<span class="fc" id="L94">        Position temp = movePiece.getPosition();</span>
+
+        // történik-e ütés
+<span class="fc" id="L97">        Piece tempPiece = null;</span>
+
+<span class="fc" id="L99">        ListIterator&lt;Piece&gt; iter = actualPositionClone.listIterator();</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        while (iter.hasNext()) {</span>
+<span class="fc" id="L102">            Piece current = iter.next();</span>
+
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            if (current.getPosition().equals(move)) {</span>
+<span class="nc" id="L105">                tempPiece = current;</span>
+<span class="nc" id="L106">                iter.remove();</span>
+<span class="nc" id="L107">                break;</span>
+            }
+        }
+
+<span class="fc" id="L111">        movePiece.setPosition(move);</span>
+
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (!isKingInCheck(actualPositionClone, king)) {</span>
+<span class="fc" id="L114">            movePiece.setPosition(temp);</span>
+
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">            if (tempPiece != null) {</span>
+<span class="nc" id="L117">                actualPositionClone.add(tempPiece);</span>
+            }
+
+<span class="fc" id="L120">            return false;</span>
+        }
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (tempPiece != null) {</span>
+<span class="nc" id="L124">            actualPositionClone.add(tempPiece);</span>
+        }
+
+<span class="nc" id="L127">        movePiece.setPosition(temp);</span>
+
+<span class="nc" id="L129">        return true;</span>
+    }
+
+    /**
+     * Igaz, ha a király az adott állásban sakkban van.
+     * 
+     * @param actualPosition
+     * @param king
+     * @param checkForChecksAfterMove
+     * @return
+     */
+    private static boolean isKingInCheck(List&lt;Piece&gt; actualPosition, Piece king) {
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+            // király nem tud sakkot adni
+<span class="fc bfc" id="L143" title="All 4 branches covered.">            if (piece.getType() != PieceType.KING &amp;&amp; piece.getColor() != king.getColor()) {</span>
+<span class="fc" id="L144">                List&lt;Position&gt; positions = piece.getEveryMove();</span>
+
+<span class="fc" id="L146">                ListIterator&lt;Position&gt; iter = positions.listIterator();</span>
+
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                while (iter.hasNext()) {</span>
+<span class="fc" id="L149">                    Position current = iter.next();</span>
+
+                    // gyalog lépésénél az előrét nem kell figyelembe venni
+<span class="fc bfc" id="L152" title="All 4 branches covered.">                    if (piece.getType() == PieceType.PAWN &amp;&amp; current.getColumn() == piece.getPosition().getColumn()) {</span>
+<span class="fc" id="L153">                        iter.remove();</span>
+<span class="fc" id="L154">                        continue;</span>
+                    }
+
+<span class="fc bfc" id="L157" title="All 2 branches covered.">                    if (!isMovePossible(actualPosition, piece, current, piece.getColor(), false, false, null, null)) {</span>
+<span class="fc" id="L158">                        iter.remove();</span>
+                    }
+                }
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                for (Position pos : positions) {</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">                    if (pos.equals(king.getPosition())) {</span>
+<span class="nc" id="L164">                        return true;</span>
+                    }
+                }
+            }
+        }
+
+<span class="fc" id="L170">        return false;</span>
+    }
+
+    /**
+     * Ellenőrzi, hogy az adott állásban a lépés elhárítja-e a kapott sakkot.
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param nextMoveColor
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    private static boolean checkForChecksOnTheBoard(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            PieceColor nextMoveColor, Piece lastMovePiece, Position lastMovePosition) {
+<span class="fc" id="L186">        Piece king = null;</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+<span class="fc bfc" id="L188" title="All 4 branches covered.">            if (piece.getType() == PieceType.KING &amp;&amp; piece.getColor() == nextMoveColor) {</span>
+<span class="fc" id="L189">                king = piece;</span>
+            }
+        }
+
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (isKingInCheck(actualPosition, king)</span>
+<span class="nc" id="L194">                &amp;&amp; isMovePossible(actualPosition, movePiece, move, nextMoveColor, false, false, lastMovePiece,</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                        lastMovePosition)) {</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            return !isKingInCheckAfterMove(actualPosition, movePiece, move, king);</span>
+        }
+
+<span class="fc" id="L199">        return true;</span>
+    }
+
+    /**
+     * Ellenőrzi, hogy a király sakkba lép-e: ha igen, akkor nem lehetséges a lépés
+     * és hamis a visszatérési érték. Egyébként igaz.
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    private static boolean kingMovesIntoCheck(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            Piece lastMovePiece, Position lastMovePosition) {
+<span class="nc" id="L215">        ArrayList&lt;Position&gt; opponentEveryMove = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">            if (piece.getColor() != movePiece.getColor()) {</span>
+<span class="nc bnc" id="L219" title="All 2 branches missed.">                for (Position pos : piece.getEveryMove()) {</span>
+<span class="nc bnc" id="L220" title="All 4 branches missed.">                    if (piece.getType() != PieceType.KING &amp;&amp; !(piece.getType() == PieceType.PAWN</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">                            &amp;&amp; pos.getColumn() == piece.getPosition().getColumn())</span>
+<span class="nc" id="L222">                            &amp;&amp; isMovePossible(actualPosition, piece, pos, piece.getColor(), false, true, lastMovePiece,</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">                                    lastMovePosition)) {</span>
+<span class="nc" id="L224">                        opponentEveryMove.add(pos);</span>
+                    }
+                }
+            }
+        }
+
+
+<span class="nc" id="L231">        return true;</span>
+    }
+
+    /**
+     * Ha a király az ellenfél királya mellé nem léphet. Ha ez lenne a lépés,
+     * akkor a visszatérési érték hamis. Egyébként igaz.
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @return
+     */
+    private static boolean kingMovesNextToKing(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move) {
+<span class="nc" id="L244">        Piece enemyKing = null;</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L246" title="All 4 branches missed.">            if (piece.getType() == PieceType.KING &amp;&amp; piece.getColor() != movePiece.getColor()) {</span>
+<span class="nc" id="L247">                enemyKing = piece;</span>
+            }
+        }
+
+<span class="nc" id="L251">        List&lt;Position&gt; enemyKingMoves = enemyKing.getEveryMove();</span>
+
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        for (Position pos : enemyKingMoves) {</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            if (pos.equals(move)) {</span>
+<span class="nc" id="L255">                return false;</span>
+            }
+        }
+
+<span class="nc" id="L259">        return true;</span>
+    }
+
+    /**
+     * Igaz, ha a rövidsánc lehetséges
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    private static boolean shortCastlingPossible(List&lt;Piece&gt; actualPosition, Piece movePiece, Piece lastMovePiece, Position lastMovePosition) {
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        int row = movePiece.getColor() == PieceColor.WHITE ? 1 : 8;</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        int enemyRow = movePiece.getColor() == PieceColor.WHITE ? 8 : 1;</span>
+<span class="nc" id="L274">        PieceColor moveColor = movePiece.getColor();</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        PieceColor enemyColor = movePiece.getColor() == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;</span>
+        
+<span class="nc" id="L277">        List&lt;Position&gt; allEnemyMoves = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            if (piece.getColor() == enemyColor) {</span>
+<span class="nc" id="L281">                List&lt;Position&gt; pieceMoveList = piece.getEveryMove();</span>
+
+<span class="nc bnc" id="L283" title="All 2 branches missed.">                for (Position position : pieceMoveList) {</span>
+<span class="nc bnc" id="L284" title="All 4 branches missed.">                    if (piece.getType() == PieceType.KING &amp;&amp; (position.equals(new Position(&quot;g&quot;, enemyRow))</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">                            || position.equals(new Position(&quot;c&quot;, enemyRow)))) {</span>
+<span class="nc" id="L286">                        continue;</span>
+                    }
+
+<span class="nc" id="L289">                    if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false,</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">                            lastMovePiece, lastMovePosition)) {</span>
+<span class="nc" id="L291">                        allEnemyMoves.add(position);</span>
+                    }
+                }
+            }
+        }
+
+<span class="nc bnc" id="L297" title="All 2 branches missed.">        if (isKingInCheck(actualPosition, movePiece)) {</span>
+<span class="nc" id="L298">            return false;</span>
+        }
+
+        // nem tud egyik ellenfél bábu oda lépni
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        for (Position position : allEnemyMoves) {</span>
+<span class="nc bnc" id="L303" title="All 4 branches missed.">            if (position.equals(new Position(&quot;f&quot;, row)) || position.equals(new Position(&quot;g&quot;, row))) {</span>
+<span class="nc" id="L304">                return false;</span>
+            }
+        }
+
+        // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        if (movePiece.hasPieceMoved()) {</span>
+<span class="nc" id="L310">            return false;</span>
+        }
+
+<span class="nc bnc" id="L313" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L314" title="All 4 branches missed.">            if (piece.getColor() == moveColor &amp;&amp; piece.getType() == PieceType.ROOK</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">                    &amp;&amp; piece.getPosition().equals(new Position(&quot;h&quot;, row))) {</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                if (piece.hasPieceMoved()) {</span>
+<span class="nc" id="L317">                    return false;</span>
+                }
+            }
+        }
+
+<span class="nc" id="L322">        return true;</span>
+    }
+    
+    /**
+     * Igaz, ha a hosszúsánc lehetséges
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    private static boolean longCastlingPossible(List&lt;Piece&gt; actualPosition, Piece movePiece, Piece lastMovePiece,
+            Position lastMovePosition) {
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        int row = movePiece.getColor() == PieceColor.WHITE ? 1 : 8;</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        int enemyRow = movePiece.getColor() == PieceColor.WHITE ? 8 : 1;</span>
+<span class="nc" id="L338">        PieceColor moveColor = movePiece.getColor();</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">        PieceColor enemyColor = movePiece.getColor() == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;</span>
+<span class="nc" id="L340">        List&lt;Position&gt; allEnemyMoves = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L342" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (piece.getColor() == enemyColor) {</span>
+<span class="nc" id="L344">                List&lt;Position&gt; pieceMoveList = piece.getEveryMove();</span>
+
+<span class="nc bnc" id="L346" title="All 2 branches missed.">                for (Position position : pieceMoveList) {</span>
+<span class="nc bnc" id="L347" title="All 4 branches missed.">                    if (piece.getType() == PieceType.KING &amp;&amp; (position.equals(new Position(&quot;g&quot;, enemyRow))</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">                            || position.equals(new Position(&quot;c&quot;, enemyRow)))) {</span>
+<span class="nc" id="L349">                        continue;</span>
+                    }
+
+<span class="nc" id="L352">                    if (isMovePossible(actualPosition, piece, position, piece.getColor(), false, false,</span>
+<span class="nc bnc" id="L353" title="All 2 branches missed.">                            lastMovePiece, lastMovePosition)) {</span>
+<span class="nc" id="L354">                        allEnemyMoves.add(position);</span>
+                    }
+                }
+            }
+        }
+
+<span class="nc bnc" id="L360" title="All 2 branches missed.">        if (isKingInCheck(actualPosition, movePiece)) {</span>
+<span class="nc" id="L361">            return false;</span>
+        }
+
+        // nem tud egyik ellenfél bábu oda lépni
+<span class="nc bnc" id="L365" title="All 2 branches missed.">        for (Position position : allEnemyMoves) {</span>
+<span class="nc bnc" id="L366" title="All 4 branches missed.">            if (position.equals(new Position(&quot;d&quot;, row)) || position.equals(new Position(&quot;c&quot;, row))</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">                    || position.equals(new Position(&quot;b&quot;, row))) {</span>
+<span class="nc" id="L368">                return false;</span>
+            }
+        }
+
+        // ha a király vagy a bástya megmozdult, akkor nem lehet sáncolni
+<span class="nc bnc" id="L373" title="All 2 branches missed.">        if (movePiece.hasPieceMoved()) {</span>
+<span class="nc" id="L374">            return false;</span>
+        }
+
+<span class="nc bnc" id="L377" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L378" title="All 4 branches missed.">            if (piece.getColor() == moveColor &amp;&amp; piece.getType() == PieceType.ROOK</span>
+<span class="nc bnc" id="L379" title="All 2 branches missed.">                    &amp;&amp; piece.getPosition().equals(new Position(&quot;a&quot;, row))) {</span>
+<span class="nc bnc" id="L380" title="All 2 branches missed.">                if (piece.hasPieceMoved()) {</span>
+<span class="nc" id="L381">                    return false;</span>
+                }
+            }
+        }
+
+<span class="nc" id="L386">        return true;</span>
+    }
+    
+    /**
+     * Igaz, ha a sáncolás lehetséges
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    private static boolean isCastlingPossible(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            Piece lastMovePiece, Position lastMovePosition) {
+<span class="nc bnc" id="L401" title="All 2 branches missed.">        int row = movePiece.getColor() == PieceColor.WHITE ? 1 : 8;</span>
+
+        // rövidsánc
+<span class="nc bnc" id="L404" title="All 2 branches missed.">        if (move.equals(new Position(&quot;g&quot;, row))) {</span>
+<span class="nc" id="L405">            return shortCastlingPossible(actualPosition, movePiece, lastMovePiece, lastMovePosition);</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">        } else if (move.equals(new Position(&quot;c&quot;, row))) { // hosszúsánc</span>
+<span class="nc" id="L407">            return longCastlingPossible(actualPosition, movePiece, lastMovePiece, lastMovePosition);</span>
+        }
+
+<span class="nc" id="L410">        return true;</span>
+    }
+
+    /**
+     * A szabályrendszer fő függvénye, szerepe, hogy eldöntse egy lépésről, hogy az szabályos-e.
+     * Ha szabályos, akkor a visszatérési értéke igaz
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param nextMoveColor
+     * @param checkForChecks
+     * @param checkForChecksAfterMove
+     * @param lastMovePiece
+     * @param lastMovePosition
+     * @return
+     */
+    public static boolean isMovePossible(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            PieceColor nextMoveColor, boolean checkForChecks, boolean checkForChecksAfterMove, Piece lastMovePiece,
+            Position lastMovePosition) {
+        // ugyanolyan színű bábut ne lehessen &quot;ütni&quot;
+<span class="fc bfc" id="L431" title="All 2 branches covered.">        for (Piece piece : actualPosition) {</span>
+<span class="fc bfc" id="L432" title="All 4 branches covered.">            if (piece.getPosition().equals(move) &amp;&amp; movePiece.getColor() == piece.getColor()) {</span>
+<span class="fc" id="L433">                return false;</span>
+            }
+        }
+
+        // ha a király sakkban van a lépés után is, akkor nem lehetséges a lépés
+<span class="fc" id="L438">        Piece king = null;</span>
+<span class="fc bfc" id="L439" title="All 2 branches covered.">        if (checkForChecks &amp;&amp; !checkForChecksOnTheBoard(actualPosition, movePiece, move, nextMoveColor, lastMovePiece,</span>
+<span class="pc bpc" id="L440" title="1 of 2 branches missed.">                lastMovePosition)) {</span>
+<span class="nc" id="L441">            return false;</span>
+        }
+
+        // király ne léphessen sakkba
+<span class="pc bpc" id="L445" title="3 of 4 branches missed.">        if (movePiece.getType() == PieceType.KING &amp;&amp; checkForChecksAfterMove</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">                &amp;&amp; !kingMovesIntoCheck(actualPosition, movePiece, move, lastMovePiece, lastMovePosition)) {</span>
+<span class="nc" id="L447">            return false;</span>
+        }
+
+        // király mellé ne lehessen belépni királlyal
+<span class="pc bpc" id="L451" title="3 of 4 branches missed.">        if (movePiece.getType() == PieceType.KING &amp;&amp; !kingMovesNextToKing(actualPosition, movePiece, move)) {</span>
+<span class="nc" id="L452">            return false;</span>
+        }
+
+        // sáncolás
+<span class="pc bpc" id="L456" title="3 of 4 branches missed.">        if (movePiece.getType() == PieceType.KING &amp;&amp; (move.equals(new Position(&quot;g&quot;, 1))</span>
+<span class="nc bnc" id="L457" title="All 4 branches missed.">                || move.equals(new Position(&quot;c&quot;, 1)) || move.equals(new Position(&quot;g&quot;, 8))</span>
+<span class="nc bnc" id="L458" title="All 4 branches missed.">                || move.equals(new Position(&quot;c&quot;, 8))) &amp;&amp; !movePiece.hasPieceMoved()</span>
+<span class="nc bnc" id="L459" title="All 4 branches missed.">                &amp;&amp; (movePiece.getPosition().getRow() == 1 || movePiece.getPosition().getRow() == 8)) {</span>
+<span class="nc" id="L460">            return isCastlingPossible(actualPosition, movePiece, move, lastMovePiece, lastMovePosition);</span>
+        }
+
+        // &quot;lólépés&quot;
+<span class="fc bfc" id="L464" title="All 2 branches covered.">        if (movePiece.getType() == PieceType.KNIGHT) {</span>
+<span class="fc" id="L465">            king = null;</span>
+<span class="fc bfc" id="L466" title="All 2 branches covered.">            for (Piece piece : actualPosition) {</span>
+<span class="fc bfc" id="L467" title="All 4 branches covered.">                if (piece.getType() == PieceType.KING &amp;&amp; piece.getColor() == movePiece.getColor()) {</span>
+<span class="fc" id="L468">                    king = piece;</span>
+                }
+            }
+
+<span class="pc bpc" id="L472" title="1 of 4 branches missed.">            return !(checkForChecksAfterMove &amp;&amp; isKingInCheckAfterMove(actualPosition, movePiece, move, king));</span>
+        }
+
+        // gyalog ütés
+<span class="fc bfc" id="L476" title="All 2 branches covered.">        if (movePiece.getType() == PieceType.PAWN) {</span>
+<span class="fc" id="L477">            Position diagonalPos = movePiece.getPosition().rightDiagonal(movePiece.getColor(), Direction.FORWARD);</span>
+<span class="pc bpc" id="L478" title="3 of 4 branches missed.">            if (lastMovePiece != null &amp;&amp; lastMovePiece.getType() == PieceType.PAWN</span>
+<span class="nc bnc" id="L479" title="All 2 branches missed.">                    &amp;&amp; lastMovePosition.getRow() == movePiece</span>
+<span class="nc" id="L480">                            .getPosition().getRow()</span>
+<span class="nc bnc" id="L481" title="All 2 branches missed.">                    &amp;&amp; ((Pawn) lastMovePiece).getMovedTwoAtStart()</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">                    &amp;&amp; lastMovePosition.getColumn() - movePiece.getPosition().getColumn() == 1</span>
+<span class="nc bnc" id="L483" title="All 2 branches missed.">                            * (movePiece.getColor() == PieceColor.WHITE ? 1 : -1)) {</span>
+<span class="nc" id="L484">                return true;</span>
+            }
+
+<span class="fc bfc" id="L487" title="All 4 branches covered.">            if (diagonalPos != null &amp;&amp; diagonalPos.equals(move)) {</span>
+<span class="fc" id="L488">                return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());</span>
+            }
+
+<span class="fc" id="L491">            diagonalPos = movePiece.getPosition().leftDiagonal(movePiece.getColor(), Direction.FORWARD);</span>
+
+<span class="pc bpc" id="L493" title="1 of 2 branches missed.">            if (lastMovePiece != null</span>
+<span class="nc bnc" id="L494" title="All 2 branches missed.">                    &amp;&amp; lastMovePiece.getType() == PieceType.PAWN</span>
+<span class="nc bnc" id="L495" title="All 2 branches missed.">                    &amp;&amp; lastMovePosition.getRow() == movePiece.getPosition().getRow()</span>
+<span class="nc bnc" id="L496" title="All 2 branches missed.">                    &amp;&amp; ((Pawn) lastMovePiece).getMovedTwoAtStart()</span>
+<span class="nc bnc" id="L497" title="All 2 branches missed.">                    &amp;&amp; lastMovePosition.getColumn() - movePiece.getPosition().getColumn() == -1</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">                            * (movePiece.getColor() == PieceColor.WHITE ? 1 : -1)) {</span>
+<span class="nc" id="L499">                return true;</span>
+            }
+
+<span class="pc bpc" id="L502" title="2 of 4 branches missed.">            if (diagonalPos != null &amp;&amp; diagonalPos.equals(move)) {</span>
+<span class="fc" id="L503">                return isAPieceThere(actualPosition, diagonalPos, movePiece.getColor());</span>
+            }
+        }
+
+<span class="fc" id="L507">        return checkForEveryWay(actualPosition, movePiece, move, checkForChecks);</span>
+    }
+
+    /**
+     * Ellenőrzi, hogy a lépés lehetséges-e a mező irányába:
+     * ha például átlósan lép egy futó, akkor amíg eljut a lépés irányába,
+     * nem lehet az &quot;útjában&quot; más bábu, mivel nem tud &quot;átugrani&quot; bábukat.
+     * 
+     * @param actualPosition
+     * @param movePiece
+     * @param move
+     * @param checkForChecks
+     * @return
+     */
+    private static boolean checkForEveryWay(List&lt;Piece&gt; actualPosition, Piece movePiece, Position move,
+            boolean checkForChecks) {
+<span class="fc" id="L523">        int deltaRow = move.getRow() - movePiece.getPosition().getRow();</span>
+<span class="fc" id="L524">        int deltaColumn = move.getColumn() - movePiece.getPosition().getColumn();</span>
+
+<span class="fc bfc" id="L526" title="All 2 branches covered.">        if (movePiece.getColor() == PieceColor.BLACK) {</span>
+<span class="fc" id="L527">            deltaRow *= -1;</span>
+<span class="fc" id="L528">            deltaColumn *= -1;</span>
+        }
+
+        // vízszintes mozgás jobbra
+<span class="fc bfc" id="L532" title="All 4 branches covered.">        if (deltaRow == 0 &amp;&amp; deltaColumn &gt; 0) {</span>
+<span class="fc" id="L533">            UnaryOperator&lt;Position&gt; right = x -&gt; x.right(movePiece.getColor());</span>
+<span class="fc bfc" id="L534" title="All 2 branches covered.">            if (!possibleInThatWay(actualPosition, movePiece, move, right, checkForChecks)) {</span>
+<span class="fc" id="L535">                return false;</span>
+            }
+        }
+
+        // vízszintes mozgás balra
+<span class="fc bfc" id="L540" title="All 4 branches covered.">        if (deltaRow == 0 &amp;&amp; deltaColumn &lt; 0) {</span>
+<span class="fc" id="L541">            UnaryOperator&lt;Position&gt; left = x -&gt; x.left(movePiece.getColor());</span>
+<span class="pc bpc" id="L542" title="1 of 2 branches missed.">            if (!possibleInThatWay(actualPosition, movePiece, move, left, checkForChecks)) {</span>
+<span class="fc" id="L543">                return false;</span>
+            }
+        }
+
+        // függőleges mozgás felfelé
+<span class="fc bfc" id="L548" title="All 4 branches covered.">        if (deltaRow &gt; 0 &amp;&amp; deltaColumn == 0) {</span>
+<span class="fc" id="L549">            UnaryOperator&lt;Position&gt; forward = x -&gt; x.forward(movePiece.getColor());</span>
+
+            // előre ne lehessen ütni gyaloggal
+<span class="pc bpc" id="L552" title="1 of 2 branches missed.">            if (movePiece.getType() == PieceType.PAWN) {</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">                for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L554" title="All 2 branches missed.">                    if (piece.getPosition().equals(move)) {</span>
+<span class="nc" id="L555">                        return false;</span>
+                    }
+                }
+            }
+
+<span class="fc bfc" id="L560" title="All 2 branches covered.">            if (!possibleInThatWay(actualPosition, movePiece, move, forward, checkForChecks)) {</span>
+<span class="fc" id="L561">                return false;</span>
+            }
+        }
+
+        // függőleges mozgás lefelé
+<span class="pc bpc" id="L566" title="1 of 4 branches missed.">        if (deltaRow &lt; 0 &amp;&amp; deltaColumn == 0) {</span>
+<span class="nc" id="L567">            UnaryOperator&lt;Position&gt; backward = x -&gt; x.backwards(movePiece.getColor());</span>
+<span class="nc bnc" id="L568" title="All 2 branches missed.">            if (!possibleInThatWay(actualPosition, movePiece, move, backward, checkForChecks)) {</span>
+<span class="nc" id="L569">                return false;</span>
+            }
+        }
+
+        // keresztbe mozgás felfelé jobbra
+<span class="fc bfc" id="L574" title="All 4 branches covered.">        if (deltaRow &gt; 0 &amp;&amp; deltaColumn &gt; 0) {</span>
+<span class="fc" id="L575">            UnaryOperator&lt;Position&gt; rightDiagonal = x -&gt; x.rightDiagonal(movePiece.getColor(), Direction.FORWARD);</span>
+<span class="fc bfc" id="L576" title="All 2 branches covered.">            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal, checkForChecks)) {</span>
+<span class="fc" id="L577">                return false;</span>
+            }
+        }
+
+        // keresztbe mozgás lefelé jobbra
+<span class="fc bfc" id="L582" title="All 4 branches covered.">        if (deltaRow &lt; 0 &amp;&amp; deltaColumn &lt; 0) {</span>
+<span class="fc" id="L583">            UnaryOperator&lt;Position&gt; rightDiagonal = x -&gt; x.rightDiagonal(movePiece.getColor(), Direction.BACKWARD);</span>
+<span class="pc bpc" id="L584" title="1 of 2 branches missed.">            if (!possibleInThatWay(actualPosition, movePiece, move, rightDiagonal, checkForChecks)) {</span>
+<span class="nc" id="L585">                return false;</span>
+            }
+        }
+
+        // keresztbe mozgás felfelé balra
+<span class="fc bfc" id="L590" title="All 4 branches covered.">        if (deltaRow &gt; 0 &amp;&amp; deltaColumn &lt; 0) {</span>
+<span class="fc" id="L591">            UnaryOperator&lt;Position&gt; leftDiagonal = x -&gt; x.leftDiagonal(movePiece.getColor(), Direction.FORWARD);</span>
+<span class="fc bfc" id="L592" title="All 2 branches covered.">            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal, checkForChecks)) {</span>
+<span class="fc" id="L593">                return false;</span>
+            }
+        }
+
+        // keresztbe mozgás lefelé balra
+<span class="fc bfc" id="L598" title="All 4 branches covered.">        if (deltaRow &lt; 0 &amp;&amp; deltaColumn &gt; 0) {</span>
+<span class="fc" id="L599">            UnaryOperator&lt;Position&gt; leftDiagonal = x -&gt; x.leftDiagonal(movePiece.getColor(), Direction.BACKWARD);</span>
+<span class="pc bpc" id="L600" title="1 of 2 branches missed.">            if (!possibleInThatWay(actualPosition, movePiece, move, leftDiagonal, checkForChecks)) {</span>
+<span class="nc" id="L601">                return false;</span>
+            }
+        }
+
+<span class="fc" id="L605">        return true;</span>
+    }
+
+    /**
+     * Ellenőrzi, hogy véget ért már-e a játék, visszatérési értéke:
+     * - &quot;CHECKMATE&quot; (matt), ha a király sakkban van és már nincs több lehetséges
+     * lépése
+     * - &quot;STALEMATE&quot; (patt), ha a király nincs sakkban de már nincs több lehetséges
+     * lépése
+     * - &quot;NOT_FINISHED&quot; (folyamatban), minden egyéb esetben
+     * 
+     * @param actualPosition
+     * @param color
+     * @return
+     */
+    public static String getEndOfGame(List&lt;Piece&gt; actualPosition, PieceColor color) {
+<span class="nc" id="L621">        ArrayList&lt;Position&gt; everyMove = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L623">        Piece king = null;</span>
+<span class="nc bnc" id="L624" title="All 2 branches missed.">        for (Piece piece : actualPosition) {</span>
+<span class="nc bnc" id="L625" title="All 2 branches missed.">            if (piece.getColor() == color) {</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">                for (Position pos : piece.getEveryMove()) {</span>
+<span class="nc bnc" id="L627" title="All 2 branches missed.">                    if (isMovePossible(actualPosition, piece, pos, color, true, true, null, null)) {</span>
+<span class="nc" id="L628">                        everyMove.add(pos);</span>
+                    }
+                }
+
+<span class="nc bnc" id="L632" title="All 2 branches missed.">                if (piece.getType() == PieceType.KING) {</span>
+<span class="nc" id="L633">                    king = piece;</span>
+                }
+            }
+        }
+
+        // ha nincs több szabályos lépés és sakkban van a király, akkor matt
+<span class="nc bnc" id="L639" title="All 4 branches missed.">        if (everyMove.isEmpty() &amp;&amp; isKingInCheck(actualPosition, king)) {</span>
+<span class="nc" id="L640">            return &quot;CHECKMATE&quot;;</span>
+<span class="nc bnc" id="L641" title="All 4 branches missed.">        } else if (everyMove.isEmpty() &amp;&amp; !isKingInCheck(actualPosition, king)) {</span>
+            // ha nincs több szabályos lépés, de nincs sakkban a király, akkor patt
+<span class="nc" id="L643">            return &quot;STALEMATE&quot;;</span>
+        }
+
+<span class="nc" id="L646">        return &quot;NOT_FINISHED&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
