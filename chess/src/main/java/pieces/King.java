@@ -3,9 +3,17 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A király bábut megvalósító osztály.
+ */
 public class King extends Piece {
+    /**
+     * King konstruktor.
+     * Létrehoz egy királyt az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
     public King(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -20,13 +28,13 @@ public class King extends Piece {
         inStartingPosition = true;
     }
 
-    
-    /** 
-     * @return List<Position>
-     */
-    /*
+    /**
      * Lehetséges lépések:
      * minden irányba egyet, ha lehetséges
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {

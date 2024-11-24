@@ -3,9 +3,17 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A vezér bábut megvalósító osztály
+ */
 public class Queen extends Piece {
+    /**
+     * Queen konstruktor.
+     * Létrehoz egy vezér bábut az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
     public Queen(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -20,13 +28,13 @@ public class Queen extends Piece {
         inStartingPosition = true;
     }
 
-    
-    /** 
-     * @return List<Position>
-     */
-    /*
+    /**
      * Lehetséges lépések:
      * függőlegesen, vízszintesen, átlósan annyit, amíg akadályba nem ütközik
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {
