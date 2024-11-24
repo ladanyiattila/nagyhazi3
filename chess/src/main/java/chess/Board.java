@@ -20,6 +20,9 @@ import java.util.*;
 
 import pieces.*;
 
+/**
+ * A játék táblájának megvalósításáért felelős osztály
+ */
 public class Board {
     private static JPanel boardPanel;
     private static final String[] columns = { "", "A", "B", "C", "D", "E", "F", "G", "H" };

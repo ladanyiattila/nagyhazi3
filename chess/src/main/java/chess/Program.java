@@ -13,6 +13,9 @@ import javax.swing.*;
 
 import pieces.*;
 
+/**
+ * Az alkalmazás GUI-jának megjelenítéséért felelős osztály
+ */
 public class Program {
     private Program() {
     }
