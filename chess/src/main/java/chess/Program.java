@@ -42,6 +42,7 @@ public class Program {
         mainFrame.setResizable(false);
         mainFrame.setTitle("Chess");
         mainFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        mainFrame.setIconImage(new ImageIcon("piece_images/black_pawn.png").getImage());
         mainFrame.setLayout(new BorderLayout());
 
         // a főcím létrehozása
@@ -134,7 +135,7 @@ public class Program {
         mainFrame.setSize(1000, 750);
 
         JTextArea movesText = new JTextArea();
-        movesText.setSize(new Dimension(300, 400));
+        movesText.setSize(new Dimension(280, 400));
         movesText.enableInputMethods(false);
         movesText.setEditable(false);
         movesText.setLineWrap(true);
