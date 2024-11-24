@@ -3,9 +3,17 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A bástya bábut megvalósító osztály.
+ */
 public class Rook extends Piece {
+    /**
+     * Rook konstruktor.
+     * Létrehoz egy bástyát az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
     public Rook(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -20,9 +28,13 @@ public class Rook extends Piece {
         inStartingPosition = true;
     }
 
-    /*
+    /**
      * Lehetséges lépések:
      * függőlegesen vagy vízszintesen annyit, amíg akadályba nem ütközik
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {

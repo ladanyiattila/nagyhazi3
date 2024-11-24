@@ -3,9 +3,17 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A futó bábut megvalósító osztály.
+ */
 public class Bishop extends Piece {
+    /**
+     * Bishop konstruktor.
+     * Létrehoz egy futót az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
     public Bishop(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -20,9 +28,14 @@ public class Bishop extends Piece {
         inStartingPosition = true;
     }
 
-    /*
+    
+    /**
      * Lehetséges lépések:
      * minden átlón annyit, amíg akadályba nem ütközik
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {

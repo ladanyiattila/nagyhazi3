@@ -1,18 +1,21 @@
 package pieces;
 
-import java.awt.*;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A gyalog bábut megvalósító osztály.
+ */
 public class Pawn extends Piece {
     private boolean movedTwoAtStart;
 
+    /**
+     * Pawn konstruktor.
+     * Létrehoz egy gyalogot az adott színnel és pozícióval.
+     * 
+     * @param c
+     * @param p
+     */
     public Pawn(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -28,12 +31,16 @@ public class Pawn extends Piece {
         movedTwoAtStart = false;
     }
 
-    /*
+    /**
      * Lehetséges lépések:
      * - 1 lépés előre
      * - 2 lépés előre
      * - 1 lépés átlósan jobbra
      * - 1 lépés átlósan balra
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {
@@ -46,8 +53,8 @@ public class Pawn extends Piece {
         }
 
         // kezdő sorból 2 lépés is lehetséges
-        if ((color == PieceColor.WHITE && position.row == 2) 
-        || (color == PieceColor.BLACK && position.row == 7)) {
+        if ((color == PieceColor.WHITE && position.getRow() == 2) 
+        || (color == PieceColor.BLACK && position.getRow() == 7)) {
             positions.add(position.forward(color).forward(color));
         }
 
@@ -66,25 +73,22 @@ public class Pawn extends Piece {
         return positions;
     }
 
-    @Override
-    public void paint(Graphics g) {
-        Toolkit t = Toolkit.getDefaultToolkit();
-        
-        String filename;
-
-        if (this.color.equals(PieceColor.BLACK)) {
-            filename = "black_pawn.png";
-        } else {
-            filename = "white_pawn.png";
-        }
-
-        g.drawImage(t.getImage("chess/src/main/resources/" + filename), 0, 0, null);
-    }
-
+    
+    /**
+     * movedTwoAtStart getter függvénye: en passant lépés vizsgálatánál
+     * használatos
+     * 
+     * @return boolean
+     */
     public boolean getMovedTwoAtStart() {
         return movedTwoAtStart;
     }
 
+    /**
+     * movedTwoAtStart "setter" függvénye: ha kettőt lép a gyalog
+     * a kezdő pozícióból, akkor movedTwoAtStart igaz lesz;
+     * en passant lépés vizsgálatánál használatos
+     */
     public void setTwoMove() {
         movedTwoAtStart = true;
     }

@@ -41,6 +41,12 @@ class PawnTest {
         assertTrue(equalLists(expectedList, blackMovementList));
     }
 
+    
+    /** 
+     * @param expected
+     * @param got
+     * @return boolean
+     */
     public boolean equalLists(List<Position> expected, List<Position> got) {
         if (expected.size() != got.size()) {
             return false;
@@ -55,6 +61,12 @@ class PawnTest {
         return true;
     }
 
+    
+    /** 
+     * @param list
+     * @param position
+     * @return boolean
+     */
     public boolean hasPosition(List<Position> list, Position position) {
         for (Position p : list) {
             if (p.equals(position)) {

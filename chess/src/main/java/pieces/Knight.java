@@ -3,9 +3,17 @@ package pieces;
 import java.util.ArrayList;
 import java.util.List;
 
-import pieces.*;
-
+/**
+ * A ló bábut megvalósító osztály.
+ */
 public class Knight extends Piece {
+    /**
+     * Knight konstruktor.
+     * Létrehoz egy lovat az adott színnel és pozícióval
+     * 
+     * @param c
+     * @param p
+     */
     public Knight(PieceColor c, Position p) {
         this.color = c;
         this.position = p;
@@ -20,9 +28,13 @@ public class Knight extends Piece {
         inStartingPosition = true;
     }
 
-    /*
+    /**
      * Lehetséges lépések:
      * "L" alakban
+     * 
+     * Visszatérési értéke egy lista a lehetséges lépésekkel.
+     * 
+     * @return List<Position>
      */
     @Override
     public List<Position> getEveryMove() {

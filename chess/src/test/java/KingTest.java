@@ -27,7 +27,9 @@ public class KingTest {
             new Position("d", 2),
             new Position("e", 2),
             new Position("f", 2),
-            new Position("f", 1)
+            new Position("f", 1),
+            new Position("g", 1),
+            new Position("c", 1)
         ));
 
         assertTrue(equalLists(expectedList, whiteMovementList));
@@ -47,6 +49,12 @@ public class KingTest {
         assertTrue(equalLists(expectedList, blackMovementList));
     }
 
+    
+    /** 
+     * @param expected
+     * @param got
+     * @return boolean
+     */
     public boolean equalLists(List<Position> expected, List<Position> got) {
         if (expected.size() != got.size()) {
             return false;
@@ -61,6 +69,12 @@ public class KingTest {
         return true;
     }
 
+    
+    /** 
+     * @param list
+     * @param position
+     * @return boolean
+     */
     public boolean hasPosition(List<Position> list, Position position) {
         for (Position p : list) {
             if (p.equals(position)) {
