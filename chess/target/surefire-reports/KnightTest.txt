@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
 Test set: KnightTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s - in KnightTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s - in KnightTest
 KnightTest.movementTest  Time elapsed: 0.003 s

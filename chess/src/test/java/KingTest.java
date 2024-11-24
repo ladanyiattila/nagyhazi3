@@ -27,7 +27,9 @@ public class KingTest {
             new Position("d", 2),
             new Position("e", 2),
             new Position("f", 2),
-            new Position("f", 1)
+            new Position("f", 1),
+            new Position("g", 1),
+            new Position("c", 1)
         ));
 
         assertTrue(equalLists(expectedList, whiteMovementList));

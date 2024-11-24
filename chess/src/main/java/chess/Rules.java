@@ -201,8 +201,7 @@ public class Rules {
 
     /**
      * Ellenőrzi, hogy a király sakkba lép-e: ha igen, akkor nem lehetséges a lépés
-     * és hamis
-     * a visszatérési érték. Egyébként igaz.
+     * és hamis a visszatérési érték. Egyébként igaz.
      * 
      * @param actualPosition
      * @param movePiece
@@ -228,11 +227,6 @@ public class Rules {
             }
         }
 
-        for (Position pos : opponentEveryMove) {
-            if (pos.equals(move)) {
-                return false;
-            }
-        }
 
         return true;
     }
@@ -454,14 +448,15 @@ public class Rules {
         }
 
         // király mellé ne lehessen belépni királlyal
-        if (movePiece.getType() == PieceType.KING && kingMovesNextToKing(actualPosition, movePiece, move)) {
+        if (movePiece.getType() == PieceType.KING && !kingMovesNextToKing(actualPosition, movePiece, move)) {
             return false;
         }
 
         // sáncolás
         if (movePiece.getType() == PieceType.KING && (move.equals(new Position("g", 1))
-                || move.equals(new Position("c", 1))) || move.equals(new Position("g", 8))
-                || move.equals(new Position("c", 8))) {
+                || move.equals(new Position("c", 1)) || move.equals(new Position("g", 8))
+                || move.equals(new Position("c", 8))) && !movePiece.hasPieceMoved()
+                && (movePiece.getPosition().getRow() == 1 || movePiece.getPosition().getRow() == 8)) {
             return isCastlingPossible(actualPosition, movePiece, move, lastMovePiece, lastMovePosition);
         }
 

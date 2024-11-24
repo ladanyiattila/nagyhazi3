@@ -130,7 +130,7 @@ public class PGN_Formatter {
         List<Position> positions = new ArrayList<>();
 
         for (Position pos : piece.getEveryMove()) {
-            if (Rules.isMovePossible(loadedPosition, piece, pos, piece.getColor(), true, true, null, null)) {
+            if (Rules.isMovePossible(loadedPosition, piece, pos, piece.getColor(), false, false, null, null)) {
                 positions.add(pos);
             }
         }
