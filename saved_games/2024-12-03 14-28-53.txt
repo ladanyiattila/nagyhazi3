@@ -1,0 +1,1 @@
+1.e4 a6 2.e5 a5 3.a3 d5 4.exd6 a4 5.Bc4 b6 6.Nf3 b5 7.O-O bxc4 8.dxc7 c3 9.cxb8=Q 
